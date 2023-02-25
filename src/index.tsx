@@ -1,5 +1,4 @@
 import './global.css';
-import './reset.css';
 
 import * as React from 'react';
 import GlobalContext from './contexts/GlobalContext';
