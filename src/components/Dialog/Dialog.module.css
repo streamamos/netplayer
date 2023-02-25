@@ -7,23 +7,19 @@
   left: 0;
   z-index: 9999;
 }
-
 .dialogContainer {
   z-index: 9999;
   display: flex;
   margin: 0;
   transition: all 200ms;
 }
-
 .dialogContainer[aria-hidden='true'] {
   visibility: hidden;
   opacity: 0;
 }
-
 .dialogOverlay {
   background-color: rgba(0, 0, 0, 0.8);
 }
-
 .dialogContent {
   z-index: 9999;
   position: relative;
@@ -31,7 +27,6 @@
   width: auto;
   margin: auto;
 }
-
 .dialogContentMobile {
   width: 100%;
   margin-top: auto;
@@ -39,12 +34,10 @@
   margin-right: 0;
   margin-bottom: 0;
 }
-
 .dialogContainer > .dialogContentMobile {
   transition: all 200ms;
   transform: translateY(0%);
 }
-
 .dialogContainer[aria-hidden='true'] > .dialogContentMobile {
   transform: translateY(20%);
 }

@@ -8,7 +8,6 @@ import SubtitleSettings from './SubtitleSettings';
 const SubtitleMenu = () => {
   const { state, setState } = useVideoState();
   const { i18n } = useVideoProps();
-
   const handleSubtitleChange = (value: string) => {
     if (value === 'off') {
       setState((prev) => ({
@@ -19,14 +18,12 @@ const SubtitleMenu = () => {
 
       return;
     }
-
     setState((prev) => ({
       ...prev,
       isSubtitleDisabled: false,
       currentSubtitle: value,
     }));
   };
-
   return state.subtitles.length ? (
     <NestedMenu.SubMenu
       menuKey="subtitles"
@@ -42,9 +39,7 @@ const SubtitleMenu = () => {
       onChange={handleSubtitleChange}
     >
       <SubtitleSettings />
-
       <NestedMenu.Item itemKey="off" title={i18n.settings.off} value="off" />
-
       {state.subtitles.map((subtitle) => (
         <NestedMenu.Item
           key={subtitle.lang}

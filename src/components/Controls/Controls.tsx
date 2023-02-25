@@ -1,5 +1,4 @@
 import * as React from 'react';
-
 import { useVideo } from '../../contexts/VideoContext';
 import { useInteract } from '../../contexts/VideoInteractingContext';
 import { classNames } from '../../utils';
@@ -18,7 +17,6 @@ import VolumeButton from './VolumeButton';
 const Controls = () => {
   const { isInteracting } = useInteract();
   const { videoState } = useVideo();
-
   return (
     <div
       className={classNames(
@@ -32,7 +30,6 @@ const Controls = () => {
       <div className={styles.sliderContainer}>
         <ProgressSlider />
       </div>
-
       <div className={styles.buttonContainer}>
         <div className={styles.leftButtonContainer}>
           <PlayPauseButton />
@@ -51,5 +48,4 @@ const Controls = () => {
     </div>
   );
 };
-
 export default Controls;

@@ -44,30 +44,22 @@ export const SubtitleSettingsProvider: React.FC<
     ...defaultSubtitleSettings,
     ...defaultState,
   });
-
   const updateState: UpdateStateAction = useCallback(
     (stateSelector) => {
       const newState = stateSelector(state);
-
       setState({ ...state, ...newState });
     },
     [state]
   );
-
   useEffect(() => {
     const rawSettings = localStorage.getItem(LOCALSTORAGE_KEY);
-
     if (!rawSettings) return;
-
     const settings = JSON.parse(rawSettings);
-
     setState(settings);
   }, []);
-
   useEffect(() => {
     localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(state));
   }, [state]);
-
   return (
     <SubtitleSettingsContext.Provider value={{ state, setState: updateState }}>
       {children}

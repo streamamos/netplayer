@@ -1,11 +1,9 @@
 .container {
   cursor: pointer;
 }
-
 .bar {
   position: absolute;
 }
-
 .dot {
   position: absolute;
   border-radius: 9999px;

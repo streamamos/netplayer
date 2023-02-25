@@ -38,19 +38,15 @@ const DefaultUI = React.forwardRef<HTMLVideoElement, NetPlayerProps>(
     const interactingTimeout = React.useRef<NodeJS.Timeout>();
     const backIndicatorRef = React.useRef<IndicatorRef>(null);
     const forwardIndicatorRef = React.useRef<IndicatorRef>(null);
-
     const resetInteractingCycle = React.useCallback(() => {
       setIsInteracting(true);
-
       if (interactingTimeout.current) {
         clearTimeout(interactingTimeout.current);
       }
-
       interactingTimeout.current = setTimeout(() => {
         setIsInteracting(false);
       }, 3000);
     }, [setIsInteracting]);
-
     const uiComponents = React.useMemo(
       () => ({
         Controls: components?.Controls || defaultComponents.Controls,
@@ -70,16 +66,12 @@ const DefaultUI = React.forwardRef<HTMLVideoElement, NetPlayerProps>(
       }),
       [components]
     );
-
     const handleDoubleTap: React.DOMAttributes<HTMLDivElement>['onTouchStart'] =
       React.useCallback((e) => {
         if (!videoRef.current) return;
-
         const { clientX } = e.changedTouches[0];
-
         const widthPercent = 45;
         const width = (window.innerWidth * widthPercent) / 100;
-
         if (clientX < width) {
           backIndicatorRef?.current?.show();
           videoRef.current.currentTime = videoRef.current.currentTime - 10;
@@ -88,41 +80,31 @@ const DefaultUI = React.forwardRef<HTMLVideoElement, NetPlayerProps>(
           videoRef.current.currentTime = videoRef.current.currentTime + 10;
         }
       }, []);
-
     const handleTap: React.DOMAttributes<HTMLDivElement>['onTouchStart'] =
       React.useCallback(
         (e) => {
           const target = e.target as HTMLDivElement;
           const videoOverlay = document.querySelector('.mobile-overlay');
-
           if (!videoOverlay) {
             resetInteractingCycle();
-
             return;
           }
-
           const shouldCloseControls =
             target.classList.contains('mobile-overlay');
-
           if (shouldCloseControls) {
             setIsInteracting(false);
-
             return;
           }
-
           resetInteractingCycle();
         },
         [resetInteractingCycle, setIsInteracting]
       );
-
     const onTap = useDoubleTap({
       onDoubleTap: handleDoubleTap,
       onTap: handleTap,
       tapThreshold: 250,
     });
-
     useGlobalHotKeys(videoRef.current!);
-
     const playerRef = React.useCallback(
       (node) => {
         videoRef.current = node;
@@ -134,7 +116,6 @@ const DefaultUI = React.forwardRef<HTMLVideoElement, NetPlayerProps>(
       },
       [ref]
     );
-
     return (
       <div
         onClick={!isMobile ? resetInteractingCycle : noop}
@@ -144,17 +125,13 @@ const DefaultUI = React.forwardRef<HTMLVideoElement, NetPlayerProps>(
       >
         <uiComponents.MobileBackwardIndicator ref={backIndicatorRef} />
         <uiComponents.MobileForwardIndicator ref={forwardIndicatorRef} />
-
         <uiComponents.Subtitle />
-
         <div className={styles.playerContainer}>
           <uiComponents.Player ref={playerRef} hlsRef={hlsRef} {...props} />
         </div>
-
         <div className={styles.overlayContainer}>
           {isMobile ? <uiComponents.MobileOverlay /> : <uiComponents.Overlay />}
         </div>
-
         <div className={styles.controlsContainer}>
           {isMobile ? (
             <uiComponents.MobileControls />

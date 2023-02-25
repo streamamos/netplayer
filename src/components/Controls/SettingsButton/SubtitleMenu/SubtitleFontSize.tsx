@@ -9,7 +9,6 @@ const fontSizes = [0.5, 0.75, 1, 1.5, 2, 3, 4];
 const SubtitleFontSize: React.FC<Partial<SubMenuProps>> = (props) => {
   const { state, setState } = useSubtitleSettings();
   const { i18n } = useVideoProps();
-
   return (
     <NestedMenu.SubMenu
       {...props}

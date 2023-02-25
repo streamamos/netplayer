@@ -22,7 +22,6 @@ const ThumbnailHover: React.FC<ThumbnailHoverProps> = ({ hoverPercent }) => {
   const [thumbnailEntries, setThumbnailEntries] = useState<Entry[]>([]);
   const { thumbnail } = useVideoProps();
   const { videoEl } = useVideo();
-
   const { floatingRef, referenceRef, update, strategy, x, y } = usePopover<
     HTMLDivElement,
     HTMLDivElement
@@ -32,67 +31,46 @@ const ThumbnailHover: React.FC<ThumbnailHoverProps> = ({ hoverPercent }) => {
     overflowElement: playerContainerClass,
     position: 'top',
   });
-
   useLayoutEffect(() => {
     const el = document.querySelector(playerContainerClass) as HTMLDivElement;
-
     if (!el) return;
-
     setPortalElement(el);
-
     update();
   }, [update]);
-
   useEffect(() => {
     if (!thumbnail) {
       setThumbnailEntries([]);
-
       return;
     }
     if (!videoEl) return;
-
     const fetchThumbnails = async () => {
       const response = await fetch(thumbnail);
-
       const text = await response.text();
-
       const { entries = [] } = parse(text);
-
       setThumbnailEntries(entries);
     };
-
     fetchThumbnails();
   }, [thumbnail, videoEl]);
-
   const currentThumbnail = useMemo(() => {
     if (!thumbnail) return undefined;
     if (!thumbnailEntries?.length) return undefined;
     if (!videoEl?.duration) return undefined;
-
     const currentTime = (hoverPercent / 100) * videoEl.duration * 1000;
-
     const currentEntry = thumbnailEntries.find(
       (entry) => entry.from <= currentTime && entry.to > currentTime
     );
-
     if (!currentEntry?.text) return undefined;
-
     const thumbnailUrlRaw = isValidUrl(currentEntry.text)
       ? currentEntry.text
       : buildAbsoluteURL(thumbnail, currentEntry.text);
-
     const { origin, pathname } = new URL(thumbnailUrlRaw);
-
     const thumbnailUrl = origin + pathname;
-
     const [x, y, w, h] = thumbnailUrlRaw
       ?.split('=')[1]
       .split(',')
       .map((a) => a.trim());
-
     // Update thumbnail position
     update();
-
     return {
       rect: {
         x: -1 * Number(x),
@@ -103,7 +81,6 @@ const ThumbnailHover: React.FC<ThumbnailHoverProps> = ({ hoverPercent }) => {
       url: thumbnailUrl,
     };
   }, [hoverPercent, thumbnail, thumbnailEntries, update, videoEl?.duration]);
-
   return currentThumbnail && portalElement ? (
     <React.Fragment>
       <div
@@ -111,7 +88,6 @@ const ThumbnailHover: React.FC<ThumbnailHoverProps> = ({ hoverPercent }) => {
         className={styles.hoverThumbnailReference}
         style={{ left: hoverPercent + '%' }}
       />
-
       <Portal element={portalElement}>
         <div
           className={styles.hoverThumbnail}

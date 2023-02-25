@@ -30,38 +30,28 @@ export const BaseIndicator = React.forwardRef<IndicatorRef, BaseIndicatorProps>(
     const innerRef = React.useRef<HTMLDivElement>(null);
     const { setIsShowingIndicator } = useInteract();
     const timeout = React.useRef<NodeJS.Timeout>();
-
     React.useImperativeHandle(ref, () => ({
       show: () => {
         if (timeout.current) {
           clearTimeout(timeout.current);
         }
-
         setShow(false);
-
         setTimeout(() => {
           setShow(true);
-
           setIsShowingIndicator(true);
         }, 0);
-
         timeout.current = setTimeout(() => {
           setShow(false);
-
           setIsShowingIndicator(false);
         }, ANIMATION_TIME);
       },
       hide: () => setShow(false),
     }));
-
     React.useLayoutEffect(() => {
       const containerEl = document.querySelector('.' + PLAYER_CONTAINER_CLASS);
-
       if (!containerEl) return;
-
       setContainer(containerEl);
     }, []);
-
     return (
       <Portal element={container}>
         {show && (

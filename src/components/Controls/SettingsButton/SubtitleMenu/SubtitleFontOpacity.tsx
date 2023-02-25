@@ -9,7 +9,6 @@ const opacities = [0, 25, 50, 75, 100];
 const SubtitleFontOpacity: React.FC<Partial<SubMenuProps>> = (props) => {
   const { state, setState } = useSubtitleSettings();
   const { i18n } = useVideoProps();
-
   return (
     <NestedMenu.SubMenu
       {...props}

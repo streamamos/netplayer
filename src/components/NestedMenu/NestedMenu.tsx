@@ -39,21 +39,16 @@ const NestedMenu = ({
   ...props
 }: PropsWithChildren<NestedMenuProps>) => {
   const [history, setHistory] = useState<Menu[]>(defaultHistory);
-
   const handleGoBack = useCallback(() => {
     setHistory((prev) => prev.slice(0, -1));
   }, []);
-
   const historyPush = useCallback((menu: Menu) => {
     setHistory((prev) => [...prev, menu]);
   }, []);
-
   const historyPop = useCallback(() => {
     setHistory((prev) => prev.slice(0, -1));
   }, []);
-
   const activeMenu = useMemo(() => history[history.length - 1], [history]);
-
   return (
     <NestedMenuContext.Provider
       value={{
@@ -76,7 +71,6 @@ const NestedMenu = ({
             {activeMenu.title}
           </TextIcon>
         )}
-
         <ul className={styles.itemContainer}>{children}</ul>
       </div>
     </NestedMenuContext.Provider>

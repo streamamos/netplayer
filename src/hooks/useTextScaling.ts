@@ -9,52 +9,39 @@ const guidelineBaseHeight = 680;
 const getDimension = () => {
   let width = window.screen.width;
   let height = window.screen.height;
-
   const containerEl = document.querySelector('.' + PLAYER_CONTAINER_CLASS);
-
   if (containerEl) {
     const { width: containerWidth, height: containerHeight } =
       containerEl.getBoundingClientRect();
-
     width = containerWidth;
     height = containerHeight;
   }
-
   const [shortDimension, longDimension] =
     width < height ? [width, height] : [height, width];
-
   return [shortDimension, longDimension];
 };
 
 const useTextScaling = () => {
   const [[shortDimension, longDimension], setDimension] =
     useState(getDimension);
-
   useEffect(() => {
     const containerEl = document.querySelector('.' + PLAYER_CONTAINER_CLASS);
-
     const handleResize = () => {
       setDimension(getDimension());
     };
-
     if (containerEl) {
       containerEl.addEventListener('resize', handleResize);
     }
-
     window.addEventListener('resize', handleResize);
-
     return () => {
       containerEl?.removeEventListener('resize', handleResize);
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-
   const update = useCallback(() => {
     const [shortDimension, longDimension] = getDimension();
-
     setDimension([shortDimension, longDimension]);
   }, []);
-
   const scale = useCallback(
     (size: number) => (shortDimension / guidelineBaseWidth) * size,
     [shortDimension]
@@ -72,7 +59,6 @@ const useTextScaling = () => {
       size + (verticalScale(size) - size) * factor,
     [verticalScale]
   );
-
   return {
     scale,
     verticalScale,

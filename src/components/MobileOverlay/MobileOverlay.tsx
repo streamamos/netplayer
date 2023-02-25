@@ -17,7 +17,6 @@ const MobileOverlay = () => {
   const { isInteracting, isShowingIndicator } = useInteract();
   const { i18n } = useVideoProps();
   const { videoState } = useVideo();
-
   const shouldInactive = React.useMemo(() => {
     return (
       (!isInteracting && !videoState.seeking && !videoState.buffering) ||
@@ -29,7 +28,6 @@ const MobileOverlay = () => {
     videoState.buffering,
     videoState.seeking,
   ]);
-
   return (
     <div
       className={classNames(
@@ -51,9 +49,7 @@ const MobileOverlay = () => {
       >
         {i18n.controls.sliderDragMessage}
       </TextIcon>
-
       <MobileVolumeSlider />
-
       <div
         className={classNames(
           styles.uiContainer,
@@ -65,17 +61,14 @@ const MobileOverlay = () => {
             <div className={styles.backwardButton}>
               <BackwardButton />
             </div>
-
             <div className={styles.playButton}>
               <PlayPauseButton />
             </div>
-
             <div className={styles.forwardButton}>
               <ForwardButton />
             </div>
           </div>
         </div>
-
         <div className={styles.mobileTopButtons}>
           <ScreenshotButton />
           <SettingsButton />

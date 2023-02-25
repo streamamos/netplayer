@@ -23,24 +23,19 @@ const VolumeButton = () => {
   const { i18n } = useVideoProps();
   const hotkey = useHotKey('volume');
   const previousVolume = useRef(videoState.volume);
-
   const VolumeComponent = useMemo(() => {
     const entries = Object.entries(VolumeComponents).sort(
       (a, b) => Number(a[0]) - Number(b[0])
     );
-
     for (const [key, value] of entries) {
       if (videoState.volume <= Number(key)) {
         return value;
       }
     }
-
     return VolumeMutedIcon;
   }, [videoState.volume]);
-
   const handleClick = useCallback(() => {
     if (!videoEl) return;
-
     if (videoEl.volume === 0) {
       videoEl.volume = previousVolume.current;
     } else {
@@ -48,16 +43,13 @@ const VolumeButton = () => {
       videoEl.volume = 0;
     }
   }, [videoEl]);
-
   const handleVolumeChange = useCallback(
     (percent: number) => {
       if (!videoEl) return;
-
       videoEl.volume = percent / 100;
     },
     [videoEl]
   );
-
   return (
     <div className={styles.buttonContainer}>
       <ControlButton
@@ -74,7 +66,6 @@ const VolumeButton = () => {
       >
         <VolumeComponent />
       </ControlButton>
-
       <Slider
         onPercentChange={handleVolumeChange}
         onPercentChanging={handleVolumeChange}

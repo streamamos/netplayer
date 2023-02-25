@@ -9,11 +9,9 @@
   align-items: center;
   justify-content: space-evenly;
 }
-
 .container.interacting {
   bottom: 6rem;
 }
-
 .text {
   width: fit-content;
   color: white;

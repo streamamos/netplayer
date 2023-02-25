@@ -51,41 +51,32 @@ const Slider = ({
   const sliderRef = useRef<HTMLDivElement>(null);
   const isMouseDown = useRef(false);
   const lastTouch = useRef<React.Touch | null>(null);
-
   const calculatePercent = useCallback(
     (offset: number) => {
       if (!sliderRef.current) return 0;
-
       const { width, left, top, height } =
         sliderRef.current?.getBoundingClientRect()!;
-
       const percent = vertical
         ? (height + top - offset) / height
         : (offset - left) / width;
-
       const newPercent = percent <= 0 || isNaN(percent) ? 0 : percent * 100;
-
       return newPercent > 100 ? 100 : newPercent;
     },
     [vertical]
   );
-
   const handleDocumentTouchMove = useCallback((e: TouchEvent) => {
     if (e.cancelable) {
       e.preventDefault();
     }
   }, []);
-
   const handleTouchStart: React.TouchEventHandler<HTMLDivElement> = useCallback(
     (e) => {
       document.addEventListener('touchmove', handleDocumentTouchMove, {
         passive: false,
       });
-
       isMouseDown.current = true;
       const offset = vertical ? e.touches[0].clientY : e.touches[0].clientX;
       const percent = calculatePercent(offset);
-
       onPercentChange?.(percent);
       onDragStart?.(percent);
       onTouchStart?.(e);
@@ -99,13 +90,11 @@ const Slider = ({
       vertical,
     ]
   );
-
   const handleTouchMove: React.TouchEventHandler<HTMLDivElement> = useCallback(
     (e) => {
       lastTouch.current = e.touches[0];
       const offset = vertical ? e.touches[0].clientY : e.touches[0].clientX;
       const percent = calculatePercent(offset);
-
       onPercentIntent?.(percent);
       onTouchMove?.(e);
       onPercentChanging?.(percent);
@@ -118,22 +107,16 @@ const Slider = ({
       onPercentChanging,
     ]
   );
-
   const handleTouchEnd: React.TouchEventHandler<HTMLDivElement> = useCallback(
     (e) => {
       document.removeEventListener('touchmove', handleDocumentTouchMove);
-
       isMouseDown.current = false;
-
       onPercentIntent?.(0);
       onTouchEnd?.(e);
-
       if (!lastTouch.current) return;
-
       const percent = calculatePercent(
         vertical ? lastTouch.current.clientY : lastTouch.current.clientX
       );
-
       onDragEnd?.(percent);
       onPercentChange?.(percent);
     },
@@ -147,25 +130,21 @@ const Slider = ({
       onPercentChange,
     ]
   );
-
   const handleMouseDown: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (e) => {
       isMouseDown.current = true;
       const offset = vertical ? e.clientY : e.clientX;
       const percent = calculatePercent(offset);
-
       onDragEnd?.(percent);
       onPercentChange?.(percent);
       onMouseDown?.(e);
     },
     [vertical, calculatePercent, onDragEnd, onPercentChange, onMouseDown]
   );
-
   const handleMouseUp: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (e) => {
       isMouseDown.current = false;
       const percent = calculatePercent(vertical ? e.clientY : e.clientX);
-
       onDragEnd?.(percent);
       onPercentChange?.(percent);
       onPercentIntent?.(0);
@@ -180,14 +159,11 @@ const Slider = ({
       onMouseUp,
     ]
   );
-
   const handleMouseMove: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (e) => {
       const percent = calculatePercent(vertical ? e.clientY : e.clientX);
-
       onPercentIntent?.(percent);
       onMouseMove?.(e);
-
       if (isMouseDown.current) {
         onPercentChanging?.(percent);
       }
@@ -200,41 +176,30 @@ const Slider = ({
       onPercentChanging,
     ]
   );
-
   const handleMouseLeave: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (e) => {
       onMouseLeave?.(e);
-
       if (!isMouseDown.current) {
         onPercentIntent?.(0);
-
         return;
       }
-
       // Handle if user dragging outside of slider
       const handleWindowMouseMove = (e: MouseEvent) => {
         const percent = calculatePercent(vertical ? e.clientY : e.clientX);
-
         onPercentIntent?.(percent);
-
         if (isMouseDown.current) {
           onPercentChanging?.(percent);
         }
       };
-
       const handleWindowMouseUp = (e: MouseEvent) => {
         isMouseDown.current = false;
-
         const percent = calculatePercent(vertical ? e.clientY : e.clientX);
-
         onDragEnd?.(percent);
         onPercentIntent?.(0);
         onPercentChange?.(percent);
-
         window.removeEventListener('mousemove', handleWindowMouseMove);
         window.removeEventListener('mouseup', handleWindowMouseUp);
       };
-
       window.addEventListener('mousemove', handleWindowMouseMove);
       window.addEventListener('mouseup', handleWindowMouseUp);
     },
@@ -248,17 +213,13 @@ const Slider = ({
       onPercentChange,
     ]
   );
-
   const sliderStyle = useMemo(() => {
     if (width && height) return { width, height };
-
     if (vertical) {
       return { height: '100%', width: '5px' };
     }
-
     return { width: '100%', height: '5px' };
   }, [width, height, vertical]);
-
   return (
     <SliderContext.Provider value={{ vertical }}>
       <div

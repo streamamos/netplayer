@@ -11,17 +11,13 @@ interface Props {
 const useDoubleTap = ({ onDoubleTap, onTap, tapThreshold = 300 }: Props) => {
   const lastTap = useRef(0);
   const timeout = useRef<NodeJS.Timeout>();
-
   const handleTap: Event = (e, ...args) => {
     e.persist();
-
     if (timeout.current) {
       clearTimeout(timeout.current);
     }
-
     const now = new Date().getTime();
     const timeFromLastTap = now - lastTap.current;
-
     if (timeFromLastTap <= tapThreshold && timeFromLastTap > 0) {
       onDoubleTap?.(e, ...args);
     } else {
@@ -29,10 +25,8 @@ const useDoubleTap = ({ onDoubleTap, onTap, tapThreshold = 300 }: Props) => {
         onTap?.(e, ...args);
       }, tapThreshold);
     }
-
     lastTap.current = new Date().getTime();
   };
-
   return handleTap;
 };
 

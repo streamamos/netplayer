@@ -5,7 +5,6 @@ import { convertTime } from '../../utils';
 
 const TimeIndicator = () => {
   const { videoState } = useVideo();
-
   return (
     <p>
       {convertTime(videoState.currentTime)} /{' '}

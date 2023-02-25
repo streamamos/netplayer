@@ -14,14 +14,11 @@ import useHotKey, { parseHotKey } from '../../hooks/useHotKey';
 const PlayPauseButton = () => {
   const playIndicator = React.useRef<IndicatorRef>(null);
   const pauseIndicator = React.useRef<IndicatorRef>(null);
-
   const hotkey = useHotKey('playPause');
   const { i18n } = useVideoProps();
   const { videoState, videoEl } = useVideo();
-
   const handleClick = () => {
     if (!videoEl) return;
-
     if (videoState.paused) {
       playIndicator.current?.show();
       videoEl.play();
@@ -30,7 +27,6 @@ const PlayPauseButton = () => {
       videoEl.pause();
     }
   };
-
   return (
     <ControlButton
       tooltip={
@@ -51,7 +47,6 @@ const PlayPauseButton = () => {
       ) : (
         <PauseIcon />
       )}
-
       <PlayIndicator ref={playIndicator} />
       <PauseIndicator ref={pauseIndicator} />
     </ControlButton>

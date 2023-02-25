@@ -1,5 +1,4 @@
 import * as React from 'react';
-
 import {
   defaultSubtitleSettings,
   useSubtitleSettings,
@@ -16,7 +15,6 @@ import SubtitleTextStyle from './SubtitleTextStyle';
 const SubtitleSettings: React.FC<Partial<SubMenuProps>> = (props) => {
   const { setState } = useSubtitleSettings();
   const { i18n } = useVideoProps();
-
   return (
     <NestedMenu.SubMenu
       {...props}

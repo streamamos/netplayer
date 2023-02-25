@@ -28,49 +28,35 @@ const Popover: React.FC<PopoverProps> = ({
     HTMLDivElement,
     HTMLDivElement
   >({ offset: 10, strategy: 'fixed', ...options });
-
   const { className: popperClassName = '', ...popperRest } = popperProps!;
   const { className: referenceClassName = '', ...referenceRest } =
     referenceProps!;
-
   const [isOpen, setIsOpen] = useState(false);
-
   const handleOpen: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (e) => {
       e.stopPropagation();
       e.preventDefault();
-
       update();
-
       setIsOpen(true);
     },
     [update]
   );
-
   const handleClose: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (e) => {
       e.preventDefault();
       e.stopPropagation();
-
       update();
-
       setIsOpen(false);
     },
     [update]
   );
-
   useLayoutEffect(() => {
     if (!portalSelector) return;
-
     const el = document.querySelector(portalSelector);
-
     if (!el) return;
-
     setPortalElement(el);
-
     update();
   }, [portalSelector, update]);
-
   return (
     <React.Fragment>
       <div
@@ -83,7 +69,6 @@ const Popover: React.FC<PopoverProps> = ({
       >
         {reference}
       </div>
-
       <Portal element={portalElement}>
         <div
           style={{
@@ -101,7 +86,6 @@ const Popover: React.FC<PopoverProps> = ({
         >
           {children}
         </div>
-
         {isOpen && type === 'click' && (
           <div
             style={{

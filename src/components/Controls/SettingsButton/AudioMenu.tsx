@@ -7,14 +7,12 @@ import NestedMenu from '../../NestedMenu';
 const AudioMenu = () => {
   const { state, setState } = useVideoState();
   const { i18n } = useVideoProps();
-
   const handleAudioChange = (value: string) => {
     setState((prev) => ({
       ...prev,
       currentAudio: value,
     }));
   };
-
   return state.audios.length ? (
     <NestedMenu.SubMenu
       menuKey="audios"

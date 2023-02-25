@@ -48,7 +48,6 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
   children,
 }) => {
   const props = useVideoProps();
-
   const defaultQualities = useMemo(
     () =>
       props.sources
@@ -56,7 +55,6 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
         .map((source) => source.label!),
     [props.sources]
   );
-
   const defaultState = useMemo(
     () => ({
       currentSubtitle: props.subtitles[0]?.lang,
@@ -65,20 +63,15 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
     }),
     [props.subtitles, defaultQualities]
   );
-
   const getState = useCallback(() => {
     const rawSettings = localStorage.getItem(LOCALSTORAGE_KEY);
-
     const newState = {
       ...defaultVideoState,
       ...defaultState,
       ...props?.defaultVideoState,
     };
-
     if (!rawSettings) return newState;
-
     const settings: Partial<VideoState> = JSON.parse(rawSettings);
-
     const langAudios = newState.audios
       .filter((a) => a?.lang)
       .map((a) => a.lang);
@@ -86,7 +79,6 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
       .filter((a) => a?.lang)
       .map((s) => s.lang);
     const langQualities = newState.qualities;
-
     const filteredSettings = {
       currentAudio:
         isInArray(settings?.currentAudio, langAudios) || langAudios.length === 0
@@ -103,18 +95,13 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
           ? (settings.currentSubtitle as string) || null
           : newState.currentSubtitle,
     };
-
     return { ...newState, ...filteredSettings };
   }, [defaultState, props?.defaultVideoState]);
-
   const [state, setState] = React.useState<VideoState>(getState);
-
   useEffect(() => {
     const state = getState();
-
     setState(state);
   }, [getState]);
-
   useEffect(() => {
     const {
       currentAudio,
@@ -122,7 +109,6 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
       currentSubtitle,
       isSubtitleDisabled,
     } = state;
-
     localStorage.setItem(
       LOCALSTORAGE_KEY,
       JSON.stringify({
@@ -133,11 +119,9 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
       })
     );
   }, [state]);
-
   const updateState: UpdateStateAction = (stateSelector) => {
     setState((prev) => ({ ...prev, ...stateSelector(prev) }));
   };
-
   return (
     <VideoStateContext.Provider value={{ state, setState: updateState }}>
       {children}

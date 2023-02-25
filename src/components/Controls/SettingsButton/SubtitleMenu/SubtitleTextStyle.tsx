@@ -1,5 +1,4 @@
 import * as React from 'react';
-
 import { useSubtitleSettings } from '../../../../contexts/SubtitleSettingsContext';
 import { useVideoProps } from '../../../../contexts/VideoPropsContext';
 import NestedMenu, { SubMenuProps } from '../../../NestedMenu/NestedMenu';
@@ -7,7 +6,6 @@ import NestedMenu, { SubMenuProps } from '../../../NestedMenu/NestedMenu';
 const SubtitleTextStyle: React.FC<Partial<SubMenuProps>> = (props) => {
   const { state, setState } = useSubtitleSettings();
   const { i18n } = useVideoProps();
-
   return (
     <NestedMenu.SubMenu
       {...props}

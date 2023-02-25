@@ -3,12 +3,10 @@ import { useVideoProps } from '../contexts/VideoPropsContext';
 
 const useHotKey = (hotKeyName: string) => {
   const { hotkeys } = useVideoProps();
-
   const hotkey = useMemo(
     () => hotkeys.find(({ name }) => name === hotKeyName),
     [hotkeys, hotKeyName]
   );
-
   return hotkey;
 };
 
@@ -17,11 +15,9 @@ export const parseHotKey = (
   seperator = '/'
 ) => {
   if (!hotkey) return '';
-
   if (Array.isArray(hotkey)) {
     return hotkey.join(seperator);
   }
-
   return hotkey;
 };
 

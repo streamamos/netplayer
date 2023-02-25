@@ -18,28 +18,21 @@ const Dialog: React.FC<DialogProps> = ({
     document.body
   );
   const [show, setShow] = React.useState(false);
-
   React.useLayoutEffect(() => {
     if (!portalSelector) return;
-
     const el = document.querySelector(portalSelector);
-
     if (!el) return;
-
     setPortalElement(el);
   }, [portalSelector]);
-
   return (
     <React.Fragment>
       <div onClick={() => setShow(true)}>{reference}</div>
-
       <Portal element={portalElement}>
         <div className={classNames(styles.dialogContainer)} aria-hidden={!show}>
           <div
             onClick={() => setShow(false)}
             className={styles.dialogOverlay}
           />
-
           <div
             className={classNames(
               styles.dialogContent,

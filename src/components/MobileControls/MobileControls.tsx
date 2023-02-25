@@ -10,7 +10,6 @@ import styles from './MobileControls.module.css';
 const MobileControls = () => {
   const { isInteracting, isShowingIndicator } = useInteract();
   const { videoState } = useVideo();
-
   const shouldInactive = React.useMemo(() => {
     return (
       (!videoState.seeking && !isInteracting && !videoState.buffering) ||
@@ -22,7 +21,6 @@ const MobileControls = () => {
     videoState.buffering,
     videoState.seeking,
   ]);
-
   return (
     <div
       className={classNames(
@@ -32,17 +30,14 @@ const MobileControls = () => {
     >
       <div className={styles.controlsContainer}>
         <TimeIndicator />
-
         <div className={styles.fullscreenButton}>
           <FullscreenButton />
         </div>
       </div>
-
       <div className={styles.sliderContainer}>
         <ProgressSlider />
       </div>
     </div>
   );
 };
-
 export default React.memo(MobileControls);

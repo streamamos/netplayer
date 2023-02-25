@@ -17,38 +17,30 @@ const VolumeComponents = {
 const MobileVolumeSlider = () => {
   const { videoState, videoEl } = useVideo();
   const { setIsInteracting } = useInteract();
-
   const handleVolumeChange = useCallback(
     (percent: number) => {
       setIsInteracting(true);
-
       if (!videoEl) return;
-
       videoEl.volume = percent / 100;
     },
     [setIsInteracting, videoEl]
   );
-
   const VolumeComponent = useMemo(() => {
     const entries = Object.entries(VolumeComponents).sort(
       (a, b) => Number(a[0]) - Number(b[0])
     );
-
     for (const [key, value] of entries) {
       if (videoState.volume <= Number(key)) {
         return value;
       }
     }
-
     return VolumeMutedIcon;
   }, [videoState.volume]);
-
   return (
     <div className={styles.container}>
       <div className={styles.volumeIcon}>
         <VolumeComponent />
       </div>
-
       <Slider
         height="33%"
         width="5px"

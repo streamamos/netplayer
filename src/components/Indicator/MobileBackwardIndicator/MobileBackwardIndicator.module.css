@@ -13,39 +13,32 @@
   animation: fadeOut 500ms linear forwards;
   z-index: 50;
 }
-
 .iconContainer {
   width: 4rem;
   height: 4rem;
   animation: rotate 500ms cubic-bezier(0.32, 0.94, 0.99, 1.12);
 }
-
 @keyframes fadeOut {
   0% {
     opacity: 1;
     visibility: visible;
   }
-
   90% {
     opacity: 1;
     visibility: visible;
   }
-
   100% {
     opacity: 0;
     visibility: hidden;
   }
 }
-
 @keyframes rotate {
   0% {
     transform: rotate(0deg);
   }
-
   50% {
     transform: rotate(-45deg);
   }
-
   100% {
     transform: rotate(0deg);
   }
