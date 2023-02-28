@@ -9,7 +9,6 @@ import DefaultUI from './components/DefaultUI';
 const InnerPlayer = React.forwardRef<HTMLVideoElement, NetPlayerProps>(
   ({ hlsRef = React.createRef(), children, ...props }, ref) => {
     const videoRef = React.useRef<HTMLVideoElement | null>(null);
-
     const playerRef = React.useCallback(
       (node) => {
         videoRef.current = node;
@@ -21,7 +20,6 @@ const InnerPlayer = React.forwardRef<HTMLVideoElement, NetPlayerProps>(
       },
       [ref]
     );
-
     return (
       <VideoContextProvider videoRef={videoRef} hlsRef={hlsRef}>
         {children || <DefaultUI ref={playerRef} {...props} />}

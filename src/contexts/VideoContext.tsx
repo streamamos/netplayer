@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect } from 'react';
-import Hls from '../types/hls.js';
+import Hls from 'hls.js';
 
 interface VideoState {
   currentTime: number;

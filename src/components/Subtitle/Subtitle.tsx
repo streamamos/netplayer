@@ -103,9 +103,8 @@ const Subtitle = () => {
           color: `rgba(255, 255, 255, ${subtitleSettings.fontOpacity})`,
           textShadow: textStyles[subtitleSettings.textStyle],
         }}
-      >
-        {currentText}
-      </p>
+        dangerouslySetInnerHTML={{ __html: currentText }}
+      ></p>
     </div>
   );
 };

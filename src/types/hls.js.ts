@@ -1954,6 +1954,7 @@ declare class Hls implements HlsEventEmitter {
   get forceStartLoad(): boolean;
 }
 export default Hls;
+console.log('Hls: ', Hls);
 
 export declare interface HlsChunkPerformanceTiming
   extends HlsPerformanceTiming {

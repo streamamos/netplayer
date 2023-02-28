@@ -26,7 +26,7 @@ const shortcuts = [
 ] as const;
 
 export type Shortcut = string | string[];
-export type Shortcuts = Record<typeof shortcuts[number], Shortcut>;
+export type Shortcuts = Record<(typeof shortcuts)[number], Shortcut>;
 
 export type HotKey = {
   fn: (videoEl: HTMLVideoElement) => void;

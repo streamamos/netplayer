@@ -9,10 +9,10 @@
     "push-gh-pages": "push-dir --dir=dist --branch=gh-pages --cleanup --verbose"
   },
   "dependencies": {
-    "netplayer": "file:../",
-    "react": "file:../node_modules/react",
+    "netplayer": "../",
+    "react": "../node_modules/react",
     "react-app-polyfill": "^1.0.0",
-    "react-dom": "file:../node_modules/react-dom/profiling",
+    "react-dom": "../node_modules/react-dom/profiling",
     "react-live": "^2.4.1",
     "url-toolkit": "^2.2.5"
   },
