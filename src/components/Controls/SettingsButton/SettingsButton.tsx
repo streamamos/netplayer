@@ -1,8 +1,8 @@
 import * as React from 'react';
 
+import { isDesktop, isMobile } from 'react-device-detect';
 import { PLAYER_CONTAINER_CLASS } from '../../../constants';
 import { useVideoProps } from '../../../contexts/VideoPropsContext';
-import { isDesktop, isMobile } from '../../../utils/device';
 import Dialog from '../../Dialog';
 import SettingsIcon from '../../icons/SettingsIcon';
 import NestedMenu from '../../NestedMenu';

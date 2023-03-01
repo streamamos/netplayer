@@ -5,6 +5,7 @@ export { default as MobileControls } from './MobileControls';
 export { default as NestedMenu } from './NestedMenu';
 export { default as Overlay } from './Overlay';
 export { default as Popover } from './Popover';
+export { default as Controls } from './Controls';
 export { default as Player } from './Player';
 export { default as Slider } from './Slider';
 export { default as Subtitle } from './Subtitle';

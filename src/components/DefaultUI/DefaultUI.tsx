@@ -1,13 +1,14 @@
 import * as React from 'react';
+import { isMobile } from 'react-device-detect';
 import { useInteract } from '../../contexts/VideoInteractingContext';
 import { Components, NetPlayerProps } from '../../contexts/VideoPropsContext';
 import useDoubleTap from '../../hooks/useDoubleTap';
 import useGlobalHotKeys from '../../hooks/useGlobalHotKeys';
 import { classNames } from '../../utils';
-import { isMobile } from '../../utils/device';
 import { IndicatorRef } from '../Indicator/Indicator';
 import styles from './DefaultUI.module.css';
 
+import { PLAYER_CONTAINER_CLASS } from '../../constants';
 import Controls from '../Controls';
 import MobileBackwardIndicator from '../Indicator/MobileBackwardIndicator';
 import MobileForwardIndicator from '../Indicator/MobileForwardIndicator';
@@ -16,7 +17,6 @@ import MobileOverlay from '../MobileOverlay';
 import Overlay from '../Overlay';
 import Player from '../Player/Player';
 import Subtitle from '../Subtitle';
-import { PLAYER_CONTAINER_CLASS } from '../../constants';
 
 const noop = () => {};
 

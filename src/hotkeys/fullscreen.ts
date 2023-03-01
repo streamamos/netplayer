@@ -1,6 +1,6 @@
+import { isMobile } from 'react-device-detect';
 import { PLAYER_CONTAINER_CLASS } from '../constants';
 import { HotKey } from '../types';
-import { isMobile } from '../utils/device';
 import screenfull from '../utils/screenfull';
 
 const fullscreenHotKey = (hotKey: string | string[] = 'f'): HotKey => ({

@@ -1,5 +1,6 @@
 import { parse } from '@plussub/srt-vtt-parser';
 import React, { useEffect, useMemo, useState } from 'react';
+import { isDesktop } from 'react-device-detect';
 import { buildAbsoluteURL } from 'url-toolkit';
 import { useSubtitleSettings } from '../../contexts/SubtitleSettingsContext';
 import { useVideo } from '../../contexts/VideoContext';
@@ -7,7 +8,6 @@ import { useInteract } from '../../contexts/VideoInteractingContext';
 import { useVideoState } from '../../contexts/VideoStateContext';
 import useTextScaling from '../../hooks/useTextScaling';
 import { classNames, isValidUrl } from '../../utils';
-import { isDesktop } from '../../utils/device';
 import styles from './Subtitle.module.css';
 
 const textStyles = {

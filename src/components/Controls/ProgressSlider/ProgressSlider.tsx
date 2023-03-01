@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { isDesktop } from 'react-device-detect';
 import { useVideo } from '../../../contexts/VideoContext';
 import { classNames, convertTime } from '../../../utils';
-import { isDesktop } from '../../../utils/device';
 import Slider from '../../Slider';
 import ThumbnailHover from '../ThumbnailHover';
 import styles from './ProgressSlider.module.css';

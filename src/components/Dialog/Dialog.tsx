@@ -1,6 +1,6 @@
 import * as React from 'react';
+import { isMobile } from 'react-device-detect';
 import { classNames } from '../../utils';
-import { isMobile } from '../../utils/device';
 import Portal from '../Portal';
 import styles from './Dialog.module.css';
 

@@ -3,7 +3,7 @@ import { PLAYER_CONTAINER_CLASS } from '../../constants';
 import { useVideoProps } from '../../contexts/VideoPropsContext';
 import useHotKey, { parseHotKey } from '../../hooks/useHotKey';
 import { stringInterpolate } from '../../utils';
-import { isMobile } from '../../utils/device';
+import { isMobile } from 'react-device-detect';
 import screenfull from '../../utils/screenfull';
 import FullscreenEnterIcon from '../icons/FullscreenEnterIcon';
 import FullscreenExitIcon from '../icons/FullscreenExitIcon';

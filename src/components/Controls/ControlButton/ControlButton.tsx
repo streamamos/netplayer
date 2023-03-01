@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { PLAYER_CONTAINER_CLASS } from '../../../constants';
 import { classNames } from '../../../utils';
-import { isDesktop } from '../../../utils/device';
+import { isDesktop } from 'react-device-detect';
 import Popover from '../../Popover';
 import { PopoverProps } from '../../Popover/Popover';
 import styles from './ControlButton.module.css';

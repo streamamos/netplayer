@@ -1,8 +1,8 @@
 import * as React from 'react';
+import { isDesktop } from 'react-device-detect';
 import { PLAYER_CONTAINER_CLASS } from '../../constants';
 import { useInteract } from '../../contexts';
 import { classNames } from '../../utils';
-import { isDesktop } from '../../utils/device';
 import Portal from '../Portal';
 import styles from './Indicator.module.css';
 
