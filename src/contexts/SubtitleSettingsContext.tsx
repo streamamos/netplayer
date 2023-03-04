@@ -1,4 +1,11 @@
-import React, { useCallback, useContext, useEffect } from 'react';
+import React, {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 interface SubtitleSettings {
   fontSize: number;
@@ -16,6 +23,8 @@ type UpdateStateAction = (stateSelector: StateSelector) => void;
 interface SubtitleSettingsProps {
   state: SubtitleSettings;
   setState: UpdateStateAction;
+  delayTime: number;
+  setDelayTime: Dispatch<SetStateAction<number>>;
 }
 
 interface SubtitleSettingsProviderProps {
@@ -33,6 +42,8 @@ export const SubtitleSettingsContext =
   React.createContext<SubtitleSettingsProps>({
     state: defaultSubtitleSettings,
     setState: () => {},
+    delayTime: 0,
+    setDelayTime: () => {},
   });
 
 const LOCALSTORAGE_KEY = 'netplayer_subtitle_settings';
@@ -40,6 +51,7 @@ const LOCALSTORAGE_KEY = 'netplayer_subtitle_settings';
 export const SubtitleSettingsProvider: React.FC<
   SubtitleSettingsProviderProps
 > = ({ defaultState = {}, children }) => {
+  const [delayTime, setDelayTime] = useState(0);
   const [state, setState] = React.useState<SubtitleSettings>({
     ...defaultSubtitleSettings,
     ...defaultState,
@@ -61,7 +73,9 @@ export const SubtitleSettingsProvider: React.FC<
     localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(state));
   }, [state]);
   return (
-    <SubtitleSettingsContext.Provider value={{ state, setState: updateState }}>
+    <SubtitleSettingsContext.Provider
+      value={{ state, setState: updateState, delayTime, setDelayTime }}
+    >
       {children}
     </SubtitleSettingsContext.Provider>
   );

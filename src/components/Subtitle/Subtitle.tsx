@@ -40,7 +40,7 @@ const requestSubtitle = async (url: string): Promise<string | null> => {
 
 const Subtitle = () => {
   const { state } = useVideoState();
-  const { state: subtitleSettings } = useSubtitleSettings();
+  const { state: subtitleSettings, delayTime } = useSubtitleSettings();
   const { moderateScale } = useTextScaling();
   const { videoEl } = useVideo();
   const { isInteracting } = useInteract();
@@ -69,7 +69,9 @@ const Subtitle = () => {
     const handleSubtitle = () => {
       const currentTime = videoEl.currentTime * 1000;
       const currentEntry = entries.find(
-        (entry) => entry.from <= currentTime && entry.to >= currentTime
+        (entry) =>
+          entry.from <= currentTime + delayTime * -1 &&
+          entry.to >= currentTime + delayTime * -1
       );
       setCurrentText(currentEntry?.text || '');
     };
@@ -78,7 +80,7 @@ const Subtitle = () => {
       videoEl.removeEventListener('timeupdate', handleSubtitle);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subtitleText]);
+  }, [subtitleText, delayTime]);
   const fontSize = useMemo(() => {
     return moderateScale(subtitleSettings.fontSize * BASE_FONT_SIZE);
   }, [moderateScale, subtitleSettings.fontSize]);

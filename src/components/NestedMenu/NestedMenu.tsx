@@ -23,7 +23,7 @@ interface ContextProps {
   pop: () => void;
 }
 
-interface NestedMenuProps extends React.HTMLProps<HTMLDivElement> {}
+export interface NestedMenuProps extends React.HTMLProps<HTMLDivElement> {}
 
 const defaultHistory: Menu[] = [{ menuKey: 'base', title: 'base' }];
 
@@ -111,9 +111,7 @@ const BaseItem = React.memo(
         {isActive && activeIcon && (
           <div className={styles.activeIconContainer}>{activeIcon}</div>
         )}
-
         <p className={styles.baseItemTitle}>{title}</p>
-
         {slot}
       </li>
     ) : null;
@@ -176,7 +174,6 @@ const SubMenu: React.FC<SubMenuProps> = ({
   ...props
 }) => {
   const { activeMenu, push } = useContext(NestedMenuContext);
-
   const isActive = useMemo(
     () => activeMenu.menuKey === menuKey,
     [activeMenu.menuKey, menuKey]
@@ -185,46 +182,36 @@ const SubMenu: React.FC<SubMenuProps> = ({
     () => activeMenu.menuKey === parentMenuKey,
     [activeMenu.menuKey, parentMenuKey]
   );
-
   const handleSetMenu = useCallback(() => {
     push({
       menuKey,
       title,
     });
   }, [menuKey, push, title]);
-
   const resolvedChildren:
     | React.ReactElement<any, string | React.JSXElementConstructor<any>>
     | React.ReactPortal =
     React.isValidElement(children) && children.type === React.Fragment
       ? children.props.children
       : children;
-
   if (React.Children.count(resolvedChildren) === 0) {
     return null;
   }
-
   const childrenWithMenuKey = React.Children.map(resolvedChildren, (child) => {
     if (!React.isValidElement(child)) return;
-
     const newElement = React.cloneElement(child, {
       ...child.props,
       parentMenuKey: menuKey,
       activeItemKey,
       onChange,
     });
-
     return newElement;
   });
-
   const itemProps = React.Children.map(resolvedChildren, (child) => {
     if (!React.isValidElement(child)) return;
-
     return child.props as ItemProps;
   });
-
   const activeItem = itemProps?.find((item) => item?.itemKey === activeItemKey);
-
   return isActive ? (
     <ul className={classNames(styles.subMenuContainer, className)} {...props}>
       {childrenWithMenuKey}
@@ -241,7 +228,6 @@ const SubMenu: React.FC<SubMenuProps> = ({
           {activeItem?.title && (
             <p className={styles.subMenuSlotTitle}>{activeItem.title}</p>
           )}
-
           <div className={styles.subMenuSlotIcon}>
             <ArrowRightIcon />
           </div>

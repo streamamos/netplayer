@@ -1,0 +1,87 @@
+.baseItem {
+  position: relative;
+  transition: all 300ms;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 0.125rem;
+  display: flex;
+  align-items: center;
+  padding-left: 2.5rem;
+}
+.baseItem:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modalOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 250;
+}
+.modalContainer {
+  z-index: 300;
+  background: #35383f;
+  border-radius: 8px;
+  color: white;
+  padding: 30px 20px;
+  width: 100%;
+  max-width: 560px;
+}
+.modalHeading {
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;
+}
+.modalTitle {
+  text-align: center;
+  display: block;
+}
+.modalControl {
+  margin-top: 20px;
+  display: flex;
+  gap: 14px;
+}
+.modalInput {
+  background-color: transparent;
+  outline: none;
+  border: #ddd;
+  border-radius: 4px;
+  border: 1px solid #777;
+  flex: 1;
+}
+.modalInput::-webkit-outer-spin-button,
+.modalInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+.modalInput {
+  -moz-appearance: textfield;
+}
+.modalInput:focus {
+  border: 1px solid #777;
+  outline: none;
+}
+.modalButtons {
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  gap: 10px;
+}
+.modalButtons button {
+  padding: 6px 14px;
+  border-radius: 4px;
+}
+.modalButtonApply {
+  background-color: #e21221;
+}
+.modalButtonCancel {
+}
