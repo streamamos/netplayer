@@ -28,7 +28,6 @@ const ControlButton: React.FC<ControlButtonProps> = ({
       {props.children}
     </button>
   );
-
   if (tooltip && isDesktop) {
     return (
       <Popover

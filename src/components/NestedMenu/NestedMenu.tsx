@@ -131,10 +131,8 @@ const Item = React.memo(
     ...props
   }: ItemProps) => {
     const { activeMenu } = useContext(NestedMenuContext);
-
     const isMenuActive = parentMenuKey === activeMenu.menuKey;
     const isItemActive = activeItemKey === itemKey;
-
     return (
       <BaseItem
         title={title}

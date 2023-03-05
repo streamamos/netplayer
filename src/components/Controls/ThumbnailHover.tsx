@@ -46,6 +46,7 @@ const ThumbnailHover: React.FC<ThumbnailHoverProps> = ({ hoverPercent }) => {
     const fetchThumbnails = async () => {
       const response = await fetch(thumbnail);
       const text = await response.text();
+      if (!text) return;
       const { entries = [] } = parse(text);
       setThumbnailEntries(entries);
     };

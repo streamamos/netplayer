@@ -1,5 +1,4 @@
 import * as React from 'react';
-
 import { isDesktop, isMobile } from 'react-device-detect';
 import { PLAYER_CONTAINER_CLASS } from '../../../constants';
 import { useVideoProps } from '../../../contexts/VideoPropsContext';
@@ -36,7 +35,6 @@ const selector = `.${PLAYER_CONTAINER_CLASS}`;
 
 const SettingsButton = () => {
   const { i18n } = useVideoProps();
-
   return (
     <React.Fragment>
       {isMobile && (
@@ -51,7 +49,6 @@ const SettingsButton = () => {
           <Menu />
         </Dialog>
       )}
-
       {isDesktop && (
         <Popover
           portalSelector={selector}

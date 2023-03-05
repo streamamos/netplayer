@@ -1,5 +1,4 @@
 import * as React from 'react';
-
 import PauseIcon from '../icons/PauseIcon';
 import Indicator, { createIndicator } from './Indicator';
 

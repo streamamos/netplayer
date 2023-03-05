@@ -1,5 +1,4 @@
 import './global.css';
-
 import * as React from 'react';
 import GlobalContext from './contexts/GlobalContext';
 import { VideoContextProvider } from './contexts/VideoContext';

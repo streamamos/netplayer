@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
-import { useSubtitleSettings } from '../../../../contexts';
+import { useSubtitleSettings, useVideoProps } from '../../../../contexts';
 import useClickOutside from '../../../../hooks/useClickOutside';
+import { stringInterpolate } from '../../../../utils';
 import ArrowLeftIcon from '../../../icons/ArrowLeftIcon';
 import ArrowRightIcon from '../../../icons/ArrowRightIcon';
 import IconPlus from '../../../icons/IconPlus';
@@ -8,6 +9,7 @@ import MinusIcon from '../../../icons/MinusIcon';
 import styles from './index.module.css';
 
 const ModalSyncSub = ({ toggleModal }: any) => {
+  const { i18n } = useVideoProps();
   const { delayTime: delayTimeSetting, setDelayTime: setDelayTimeSetting } =
     useSubtitleSettings();
   const modalRef = useRef<HTMLDivElement>(null);
@@ -21,17 +23,19 @@ const ModalSyncSub = ({ toggleModal }: any) => {
     <div className={styles.modal}>
       <div className={styles.modalOverlay}></div>
       <div className={styles.modalContainer} ref={modalRef}>
-        <h2 className={styles.modalHeading}>Subtitle delay</h2>
+        <h2 className={styles.modalHeading}>
+          {i18n.settings.subtitleSyncHeading}
+        </h2>
         <span className={styles.modalTitle}>
           {Number(delayTime) === 0
-            ? 'No subtitle delay'
+            ? i18n.settings.subtitleSyncNoDelay
             : Number(delayTime) > 0
-            ? `Use this if subtitles are shown ${Math.abs(
-                Number(delayTime)
-              )} ms too early`
-            : `Use this if subtitles are shown ${Math.abs(
-                Number(delayTime)
-              )} ms too late`}
+            ? stringInterpolate(i18n.settings.tooEarly, {
+                miliseconds: Number(delayTime),
+              })
+            : stringInterpolate(i18n.settings.tooLate, {
+                miliseconds: Number(delayTime),
+              })}
         </span>
         <div className={styles.modalControl}>
           <button onClick={() => setDelayTime(Number(delayTime) - 1000)}>
@@ -72,10 +76,10 @@ const ModalSyncSub = ({ toggleModal }: any) => {
             className={styles.modalButtonApply}
             onClick={handleApplyDelay}
           >
-            Apply
+            {i18n.settings.apply}
           </button>
           <button className={styles.modalButtonCancel} onClick={toggleModal}>
-            Cancel
+            {i18n.settings.cancel}
           </button>
         </div>
       </div>

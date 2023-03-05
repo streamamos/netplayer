@@ -38,6 +38,13 @@ interface I18nSettings extends I18nField {
   subtitleFontOpacity: string;
   subtitleFontSize: string;
   audio: string;
+  subtitleSync: string;
+  subtitleSyncNoDelay: string;
+  subtitleSyncHeading: string;
+  apply: string;
+  cancel: string;
+  tooEarly: string;
+  tooLate: string;
 }
 
 type I18nField = { [k: string]: string | I18nField };
@@ -105,6 +112,13 @@ const defaultI18n: I18n = {
     subtitleFontOpacity: 'Font Opacity',
     subtitleFontSize: 'Font Size',
     subtitleTextStyle: 'Text Style',
+    subtitleSync: 'Sync Sub',
+    subtitleSyncNoDelay: 'No subtitle delay',
+    subtitleSyncHeading: 'Subtitle delay',
+    apply: 'Apply',
+    cancel: 'Cancel',
+    tooEarly: 'Use this if subtitles are shown {{miliseconds}} ms too early',
+    tooLate: 'Use this if subtitles are shown {{miliseconds}} ms too late',
   },
 };
 

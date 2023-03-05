@@ -10,15 +10,11 @@ const speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 const PlaybackSpeedMenu = () => {
   const { videoEl } = useVideo();
   const { i18n } = useVideoProps();
-
   const currentSpeed = videoEl?.playbackRate || 1;
-
   const handleChangeSpeed = (value: string) => {
     if (!videoEl) return;
-
     videoEl.playbackRate = Number(value);
   };
-
   return (
     <NestedMenu.SubMenu
       menuKey="speed"

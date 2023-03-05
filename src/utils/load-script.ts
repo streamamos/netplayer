@@ -14,11 +14,9 @@ const getDefinedScript = (variableName: string) => {
     // @ts-ignore
     return window[variableName];
   }
-
   if (window.exports && window.exports[variableName]) {
     return window.exports[variableName];
   }
-
   if (
     window.module &&
     window.module.exports &&
@@ -26,7 +24,6 @@ const getDefinedScript = (variableName: string) => {
   ) {
     return window.module.exports[variableName];
   }
-
   return null;
 };
 
@@ -38,15 +35,11 @@ function loadScript<T>(
   return new Promise((resolve, reject) => {
     if (loadedScripts[variableName]) {
       resolve(getDefinedScript(variableName));
-
       return;
     }
-
     load(src, options, (err, script) => {
       if (err) return reject(err);
-
       loadedScripts[variableName] = script;
-
       resolve(getDefinedScript(variableName));
     });
   });

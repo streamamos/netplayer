@@ -15,7 +15,6 @@ const SubtitleMenu = () => {
         isSubtitleDisabled: true,
         currentSubtitle: null,
       }));
-
       return;
     }
     setState((prev) => ({

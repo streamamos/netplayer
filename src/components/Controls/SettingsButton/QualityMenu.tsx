@@ -7,11 +7,9 @@ import NestedMenu from '../../NestedMenu';
 const QualityMenu = () => {
   const { state, setState } = useVideoState();
   const { i18n } = useVideoProps();
-
   const handleQualityChange = (value: string) => {
     setState(() => ({ currentQuality: value }));
   };
-
   return state.qualities.length ? (
     <NestedMenu.SubMenu
       menuKey="quality"
