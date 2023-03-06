@@ -44,11 +44,15 @@ const ThumbnailHover: React.FC<ThumbnailHoverProps> = ({ hoverPercent }) => {
     }
     if (!videoEl) return;
     const fetchThumbnails = async () => {
-      const response = await fetch(thumbnail);
-      const text = await response.text();
-      if (!text) return;
-      const { entries = [] } = parse(text);
-      setThumbnailEntries(entries);
+      try {
+        const response = await fetch(thumbnail);
+        const text = await response.text();
+        if (!text) return;
+        const { entries = [] } = parse(text);
+        setThumbnailEntries(entries);
+      } catch (error) {
+        console.log('error: ', error);
+      }
     };
     fetchThumbnails();
   }, [thumbnail, videoEl]);

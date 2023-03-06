@@ -19,23 +19,28 @@ const BASE_FONT_SIZE = 16;
 const LINE_HEIHT_RATIO = 1.333;
 const M3U8_SUBTITLE_REGEX = /.*\.(vtt|srt)/g;
 const requestSubtitle = async (url: string): Promise<string | null> => {
-  if (url.includes('vtt') || url.includes('srt')) {
-    const response = await fetch(url);
-    const text = await response.text();
-    return text;
+  try {
+    if (url.includes('vtt') || url.includes('srt')) {
+      const response = await fetch(url);
+      const text = await response.text();
+      return text;
+    }
+    if (url.includes('m3u8')) {
+      const response = await fetch(url);
+      const text = await response.text();
+      const matches = text.match(M3U8_SUBTITLE_REGEX);
+      if (!matches?.length) return null;
+      if (!matches[0]) return null;
+      const nextUrl = isValidUrl(matches[0])
+        ? matches[0]
+        : buildAbsoluteURL(url, matches[0]);
+      return requestSubtitle(nextUrl);
+    }
+    return null;
+  } catch (error) {
+    console.log('error text: ', error);
+    return null;
   }
-  if (url.includes('m3u8')) {
-    const response = await fetch(url);
-    const text = await response.text();
-    const matches = text.match(M3U8_SUBTITLE_REGEX);
-    if (!matches?.length) return null;
-    if (!matches[0]) return null;
-    const nextUrl = isValidUrl(matches[0])
-      ? matches[0]
-      : buildAbsoluteURL(url, matches[0]);
-    return requestSubtitle(nextUrl);
-  }
-  return null;
 };
 
 const Subtitle = () => {
@@ -63,19 +68,24 @@ const Subtitle = () => {
     getSubtitle();
   }, [subtitle]);
   useEffect(() => {
-    if (!subtitleText) return;
     if (!videoEl) return;
-    const { entries = [] } = parse(subtitleText);
-    const handleSubtitle = () => {
-      const currentTime = videoEl.currentTime * 1000;
-      const currentEntry = entries.find(
-        (entry) =>
-          entry.from <= currentTime + delayTime * -1 &&
-          entry.to >= currentTime + delayTime * -1
-      );
-      setCurrentText(currentEntry?.text || '');
-    };
-    videoEl.addEventListener('timeupdate', handleSubtitle);
+    let handleSubtitle: () => void = () => {};
+    try {
+      if (!subtitleText) return;
+      const { entries = [] } = parse(subtitleText);
+      handleSubtitle = () => {
+        const currentTime = videoEl.currentTime * 1000;
+        const currentEntry = entries.find(
+          (entry) =>
+            entry.from <= currentTime + delayTime * -1 &&
+            entry.to >= currentTime + delayTime * -1
+        );
+        setCurrentText(currentEntry?.text || '');
+      };
+      videoEl.addEventListener('timeupdate', handleSubtitle);
+    } catch (error) {
+      console.log('error: ', error);
+    }
     return () => {
       videoEl.removeEventListener('timeupdate', handleSubtitle);
     };
