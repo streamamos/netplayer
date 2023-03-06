@@ -6,21 +6,17 @@ export function convertTime(seconds: string | number) {
   seconds = seconds.toString();
   let minutes = Math.floor(Number(seconds) / 60).toString();
   let hours = '';
-
   if (Number(minutes) > 59) {
     hours = Math.floor(Number(minutes) / 60).toString();
     hours = Number(hours) >= 10 ? hours : `0${hours}`;
     minutes = (Number(minutes) - Number(hours) * 60).toString();
     minutes = Number(minutes) >= 10 ? minutes : `0${minutes}`;
   }
-
   seconds = Math.floor(Number(seconds) % 60).toString();
   seconds = Number(seconds) >= 10 ? seconds : '0' + seconds;
-
   if (hours) {
     return `${hours}:${minutes}:${seconds}`;
   }
-
   return `${minutes}:${seconds}`;
 }
 
@@ -56,13 +52,10 @@ export function mergeDeep(target, ...sources) {
 export const randomString = (length: number) => {
   const chars =
     '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghiklmnopqrstuvwxyz'.split('');
-
   if (!length) {
     length = Math.floor(Math.random() * chars.length);
   }
-
   let str = '';
-
   for (let i = 0; i < length; i++) {
     str += chars[Math.floor(Math.random() * chars.length)];
   }
@@ -71,9 +64,8 @@ export const randomString = (length: number) => {
 
 export const stringInterpolate = (str: string, data: Record<string, any>) => {
   Object.entries(data).forEach(([key, value]) => {
-    str = str.replace(`{{${key}}}`, value);
+    str = str?.replace(`{{${key}}}`, value);
   });
-
   return str;
 };
 
@@ -87,7 +79,6 @@ export const isValidUrl = (url: string) => {
       '(\\#[-a-z\\d_]*)?$',
     'i'
   ); // fragment locator
-
   return !!pattern.test(url);
 };
 

@@ -1,5 +1,4 @@
 // https://github.com/ianstormtaylor/is-hotkey
-
 const IS_MAC =
   typeof window != 'undefined' &&
   /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
@@ -76,15 +75,11 @@ for (let f = 1; f < 20; f++) {
   CODES['f' + f] = 111 + f;
 }
 
-/**
- * Is hotkey?
- */
-
+/* Is hotkey? */
 function isHotkey(hotkey: string | string[], event: KeyboardEvent) {
   if (!Array.isArray(hotkey)) {
     hotkey = [hotkey];
   }
-
   const array = hotkey.map((string) => parseHotkey(string));
   const check = (e: KeyboardEvent) =>
     array.some((object) => compareHotkey(object, e));
@@ -92,53 +87,38 @@ function isHotkey(hotkey: string | string[], event: KeyboardEvent) {
   return ret;
 }
 
-/**
- * Parse.
- */
-
+/* Parse.*/
 function parseHotkey(hotkey: string) {
   const ret: Record<string, number | boolean | null> = {};
-
   // Special case to handle the `+` key since we use it as a separator.
-  hotkey = hotkey.replace('++', '+add');
+  hotkey = hotkey?.replace('++', '+add');
   const values = hotkey.split('+');
   const { length } = values;
-
   // Ensure that all the modifiers are set to false unless the hotkey has them.
   for (const k in MODIFIERS) {
     ret[MODIFIERS[k]] = false;
   }
-
   for (let value of values) {
     const optional = value.endsWith('?') && value.length > 1;
-
     if (optional) {
       value = value.slice(0, -1);
     }
-
     const name = toKeyName(value);
     const modifier = MODIFIERS[name];
-
     if (value.length > 1 && !modifier && !ALIASES[value] && !CODES[name]) {
       throw new TypeError(`Unknown modifier: "${value}"`);
     }
-
     if (length === 1 || !modifier) {
       ret.which = toKeyCode(value);
     }
-
     if (modifier) {
       ret[modifier] = optional ? null : true;
     }
   }
-
   return ret;
 }
 
-/**
- * Compare.
- */
-
+/* Compare.*/
 function compareHotkey(
   object: Record<string, number | boolean | null>,
   event: KeyboardEvent
@@ -146,11 +126,9 @@ function compareHotkey(
   for (const key in object) {
     const expected = object[key];
     let actual;
-
     if (expected == null) {
       continue;
     }
-
     if (key === 'key' && event.key != null) {
       actual = event.key.toLowerCase();
     } else if (key === 'which') {
@@ -159,29 +137,22 @@ function compareHotkey(
       // @ts-ignore
       actual = event[key];
     }
-
     if (actual == null && expected === false) {
       continue;
     }
-
     if (actual !== expected) {
       return false;
     }
   }
-
   return true;
 }
 
-/**
- * Utils.
- */
-
+/* Utils. */
 function toKeyCode(name: string) {
   name = toKeyName(name);
   const code = CODES[name] || name.toUpperCase().charCodeAt(0);
   return code;
 }
-
 function toKeyName(name: string) {
   name = name.toLowerCase();
   name = ALIASES[name] || name;

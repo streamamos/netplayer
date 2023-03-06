@@ -262,7 +262,6 @@ const Bar: React.FC<BarProps> = ({
   ...props
 }) => {
   const { vertical } = useSlider();
-
   const barStyle = useMemo(() => {
     if (vertical) {
       return {
@@ -271,13 +270,11 @@ const Bar: React.FC<BarProps> = ({
         bottom: '0px',
       };
     }
-
     return {
       width: percent + '%',
       height: '100%',
     };
   }, [percent, vertical]);
-
   return (
     <div
       className={classNames(styles.bar, className)}
@@ -296,19 +293,16 @@ const Dot: React.FC<DotProps> = ({
   ...props
 }) => {
   const { vertical } = useSlider();
-
   const dotStyle = useMemo(() => {
     if (vertical) {
       return {
         bottom: percent + '%',
       };
     }
-
     return {
       left: percent + '%',
     };
   }, [percent, vertical]);
-
   const dotSize = useMemo(
     () => ({
       width: width + 'px',
@@ -316,7 +310,6 @@ const Dot: React.FC<DotProps> = ({
     }),
     [width, height]
   );
-
   return (
     <div
       className={classNames(styles.dot, className)}

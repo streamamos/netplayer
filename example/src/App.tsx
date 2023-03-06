@@ -12,7 +12,7 @@ const App: React.FC = () => {
       subtitles={[
         {
           lang: 'jp',
-          language: 'Japanese',
+          language: 'JapaneseJapaneseJapaneseJapaneseJapanese',
           file: 'https://cc.2cdns.com/5a/9c/5a9c8853f21c4c1c417608410c11dd15/5a9c8853f21c4c1c417608410c11dd15.vtt'
         },
         {
