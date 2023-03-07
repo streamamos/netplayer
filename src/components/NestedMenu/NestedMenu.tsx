@@ -104,6 +104,7 @@ const BaseItem = React.memo(
     className = '',
     activeIcon,
     slot,
+    children,
     ...props
   }: BaseItemProps) => {
     return isShown ? (
@@ -113,6 +114,7 @@ const BaseItem = React.memo(
         )}
         <p className={styles.baseItemTitle}>{title}</p>
         {slot}
+        {children}
       </li>
     ) : null;
   }
@@ -127,6 +129,7 @@ const Item = React.memo(
     itemKey,
     activeItemKey,
     value,
+    children,
     onChange,
     ...props
   }: ItemProps) => {
@@ -143,12 +146,55 @@ const Item = React.memo(
         }}
         activeIcon={<CheckIcon />}
         {...props}
-      />
+      >
+        {children}
+      </BaseItem>
     );
   }
 );
 
 Item.displayName = 'Item';
+
+const CustomItem = React.memo(
+  ({
+    title,
+    parentMenuKey = 'base',
+    itemKey,
+    activeItemKey,
+    value,
+    children,
+    onChange,
+    ...props
+  }: ItemProps) => {
+    const { activeMenu } = useContext(NestedMenuContext);
+    const isMenuActive = parentMenuKey === activeMenu.menuKey;
+    const isItemActive = activeItemKey === itemKey;
+    return (
+      <BaseItem
+        title={title}
+        isShown={isMenuActive}
+        isActive={isItemActive}
+        onClick={() => {
+          onChange?.(value);
+        }}
+        activeIcon={<CheckIcon />}
+        {...props}
+      >
+        {children}
+        <div className={styles.subMenuSlotContainer}>
+          {activeItemKey && (
+            <p className={styles.subMenuSlotTitle}>{activeItemKey}</p>
+          )}
+          <div className={styles.subMenuSlotIcon}>
+            <ArrowRightIcon />
+          </div>
+        </div>
+      </BaseItem>
+    );
+  }
+);
+
+CustomItem.displayName = 'CustomItem';
 
 export interface SubMenuProps
   extends Omit<React.HTMLProps<HTMLUListElement>, 'onChange'> {
@@ -238,6 +284,7 @@ const SubMenu: React.FC<SubMenuProps> = ({
 };
 
 NestedMenu.Item = Item;
+NestedMenu.CustomItem = CustomItem;
 NestedMenu.SubMenu = SubMenu;
 
 export default NestedMenu;

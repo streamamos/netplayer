@@ -11,13 +11,13 @@ const SubtitleSyncSub = (props: any) => {
   };
   return (
     <>
-      <NestedMenu.Item
+      <NestedMenu.CustomItem
         {...props}
         itemKey="subtitle_async"
         title="Sync Sub"
         onChange={() => {}}
         value="Sync Sub"
-        activeItemKey={delayTime.toString()}
+        activeItemKey={delayTime.toString() + 'ms'}
         onClick={handleToggleModal}
       />
       {isShowModal && <ModalSyncSub toggleModal={handleToggleModal} />}

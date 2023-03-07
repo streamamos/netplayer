@@ -12,6 +12,7 @@ import SubtitleFontOpacity from './SubtitleFontOpacity';
 import SubtitleFontSize from './SubtitleFontSize';
 import SubtitleSyncSub from './SubtitleSyncSub';
 import SubtitleTextStyle from './SubtitleTextStyle';
+import SubtitleUpload from './SubtitleUpload';
 
 const SubtitleSettings: React.FC<Partial<SubMenuProps>> = (props) => {
   const { setState, setDelayTime } = useSubtitleSettings();
@@ -33,6 +34,7 @@ const SubtitleSettings: React.FC<Partial<SubMenuProps>> = (props) => {
       <SubtitleTextStyle />
       <SubtitleFontOpacity />
       <SubtitleSyncSub />
+      <SubtitleUpload />
       <NestedMenu.Item
         itemKey="reset"
         title={i18n.settings.reset}

@@ -9,7 +9,7 @@
 .modalOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   z-index: 250;
 }
 .modalContainer {
@@ -72,4 +72,11 @@
   background-color: #e21221;
 }
 .modalButtonCancel {
+}
+.subtitleUploadInput {
+  position: absolute;
+  background-color: #e21221;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
 }
