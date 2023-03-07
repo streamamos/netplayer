@@ -45,6 +45,8 @@ interface I18nSettings extends I18nField {
   cancel: string;
   tooEarly: string;
   tooLate: string;
+  uploadSubtitle: string;
+  mySubtitle: string;
 }
 
 type I18nField = { [k: string]: string | I18nField };
@@ -119,6 +121,8 @@ const defaultI18n: I18n = {
     cancel: 'Cancel',
     tooEarly: 'Use this if subtitles are shown {{miliseconds}} ms too early',
     tooLate: 'Use this if subtitles are shown {{miliseconds}} ms too late',
+    uploadSubtitle: 'Upload Subtitle',
+    mySubtitle: 'My subtitle',
   },
 };
 
@@ -133,14 +137,12 @@ const defaultHotKeys: HotKey[] = [
 const mergeHotkeys = (main: HotKey[], target: HotKey[]) => {
   for (const hotkey of target) {
     const index = main.findIndex((h) => h.hotKey === hotkey.hotKey);
-
     if (index !== -1) {
       main[index] = hotkey;
     } else {
       main.push(hotkey);
     }
   }
-
   return main;
 };
 
@@ -160,7 +162,6 @@ export const VideoPropsProvider: React.FC<Partial<NetPlayerProps>> = ({
     () => mergeHotkeys(defaultHotKeys, props.hotkeys || []),
     [props.hotkeys]
   );
-
   return (
     // @ts-ignore
     <VideoPropsContext.Provider value={{ ...props, i18n, hotkeys }}>

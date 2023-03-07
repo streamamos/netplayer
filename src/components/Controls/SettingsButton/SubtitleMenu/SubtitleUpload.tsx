@@ -1,10 +1,11 @@
 import React, { ChangeEvent, useState } from 'react';
-import { useVideoState } from '../../../../contexts';
+import { useVideoProps, useVideoState } from '../../../../contexts';
 import NestedMenu from '../../../NestedMenu';
 import styles from './index.module.css';
 
 const SubtitleUpload = (props: any) => {
   const { state, setState } = useVideoState();
+  const { i18n } = useVideoProps();
   const [lengthMySubs, setLengthMySubs] = useState(0);
   const handleUploadSubtitle = async (e: ChangeEvent<HTMLInputElement>) => {
     try {
@@ -20,22 +21,18 @@ const SubtitleUpload = (props: any) => {
         type: `text/${typeOfFile};charset=ISO-8859-1`,
       });
       const path = URL.createObjectURL(blobVTT) + `#.${typeOfFile}`;
-      state.subtitles.forEach((sub) => {
-        if (sub.language.includes('My Subtitle')) {
-          setLengthMySubs((prev) => prev + 1);
-        }
-      });
       setState(() => ({
         subtitles: [
           {
             file: path,
-            lang: `My Subtitle ${lengthMySubs + 1}`,
-            language: `My Subtitle ${lengthMySubs + 1}`,
+            lang: `${i18n.settings.mySubtitle} ${lengthMySubs + 1}`,
+            language: `${i18n.settings.mySubtitle} ${lengthMySubs + 1}`,
           },
           ...state.subtitles,
         ],
-        currentSubtitle: `My Subtitle ${lengthMySubs + 1}`,
+        currentSubtitle: `${i18n.settings.mySubtitle} ${lengthMySubs + 1}`,
       }));
+      setLengthMySubs((prev) => prev + 1);
     } catch (error) {
       console.log('error: ', error);
     }
@@ -44,9 +41,9 @@ const SubtitleUpload = (props: any) => {
     <NestedMenu.CustomItem
       {...props}
       itemKey="subtitle_upload"
-      title="Upload Subtitle"
+      title={i18n.settings.uploadSubtitle}
       onChange={() => {}}
-      value="Upload Subtitle"
+      value={i18n.settings.uploadSubtitle}
       activeItemKey={lengthMySubs + ' Subs'}
     >
       <input

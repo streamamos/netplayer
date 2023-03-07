@@ -48,38 +48,29 @@ export const VideoContextProvider: React.FC<VideoContextProviderProps> = ({
   const [videoState, setVideoState] = React.useState<VideoState>(defaultState);
   const [videoEl, setVideoEl] = React.useState<HTMLVideoElement | null>(null);
   const [hls, setHls] = React.useState<Hls | null>(null);
-
   const updateState = useCallback((state: Partial<VideoState>) => {
     setVideoState((prev) => ({ ...prev, ...state }));
   }, []);
-
   useEffect(() => {
     if (!videoRef?.current) return;
-
     setVideoEl(videoRef.current);
   }, [videoRef]);
-
   useEffect(() => {
     if (!hlsRef?.current) return;
-
     setHls(hlsRef.current);
   }, [hlsRef]);
-
   useEffect(() => {
     if (!videoEl) return;
-
     const handleError = () => {
       updateState({
         error: videoEl.error?.message || 'Something went wrong with video',
       });
     };
-
     const handleWaiting = () => {
       updateState({
         buffering: true,
       });
     };
-
     const handleloadeddata = () => {
       updateState({
         currentTime: videoEl.currentTime,
@@ -88,20 +79,17 @@ export const VideoContextProvider: React.FC<VideoContextProviderProps> = ({
         error: null,
       });
     };
-
     const handlePlay = () => {
       updateState({
         paused: false,
         buffering: false,
       });
     };
-
     const handlePause = () => {
       updateState({
         paused: true,
       });
     };
-
     const handleTimeupdate = () => {
       updateState({
         currentTime: videoEl.currentTime,
@@ -111,15 +99,12 @@ export const VideoContextProvider: React.FC<VideoContextProviderProps> = ({
         paused: false,
       });
     };
-
     const handleEnded = () => {
       updateState({ ended: true, paused: true });
     };
-
     const handleVolumeChange = () => {
       updateState({ volume: videoEl.volume });
     };
-
     videoEl.addEventListener('waiting', handleWaiting);
     videoEl.addEventListener('loadeddata', handleloadeddata);
     videoEl.addEventListener('play', handlePlay);
@@ -129,7 +114,6 @@ export const VideoContextProvider: React.FC<VideoContextProviderProps> = ({
     videoEl.addEventListener('ended', handleEnded);
     videoEl.addEventListener('volumechange', handleVolumeChange);
     videoEl.addEventListener('error', handleError);
-
     return () => {
       videoEl.removeEventListener('waiting', handleWaiting);
       videoEl.removeEventListener('loadeddata', handleloadeddata);
@@ -142,17 +126,14 @@ export const VideoContextProvider: React.FC<VideoContextProviderProps> = ({
       videoEl.removeEventListener('error', handleError);
     };
   }, [updateState, videoEl]);
-
   useEffect(() => {
     if (!hls) return;
-
     hls.on(Hls.Events.ERROR, (_, data) => {
       updateState({
         error: data.details,
       });
     });
   }, [hls, updateState]);
-
   return (
     <VideoContext.Provider
       value={{ videoEl, videoState, setVideoState: updateState }}
