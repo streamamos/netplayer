@@ -48,20 +48,16 @@ const methodMap = [
 const getNativeAPI = () => {
   const unprefixedMethods = methodMap[0];
   const returnValue = {};
-
   for (const methodList of methodMap) {
     if (!methodList) continue;
-
     const exitFullscreenMethod = methodList[1];
     if (exitFullscreenMethod in document) {
       for (const [index, method] of methodList.entries()) {
         returnValue[unprefixedMethods[index]] = method;
       }
-
       return returnValue;
     }
   }
-
   return false;
 };
 
@@ -81,11 +77,8 @@ let screenfull = {
         screenfull.off('change', onFullScreenEntered);
         resolve();
       };
-
       screenfull.on('change', onFullScreenEntered);
-
       const returnPromise = element[nativeAPI.requestFullscreen](options);
-
       if (returnPromise instanceof Promise) {
         returnPromise.then(onFullScreenEntered).catch(reject);
       }
@@ -97,16 +90,12 @@ let screenfull = {
         resolve();
         return;
       }
-
       const onFullScreenExit = () => {
         screenfull.off('change', onFullScreenExit);
         resolve();
       };
-
       screenfull.on('change', onFullScreenExit);
-
       const returnPromise = document[nativeAPI.exitFullscreen]();
-
       if (returnPromise instanceof Promise) {
         returnPromise.then(onFullScreenExit).catch(reject);
       }

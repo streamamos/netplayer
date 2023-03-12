@@ -1,4 +1,4 @@
-import { isMobile } from 'react-device-detect';
+import { isIOS, isMobile } from 'react-device-detect';
 import { PLAYER_CONTAINER_CLASS } from '../constants';
 import { HotKey } from '../types';
 import screenfull from '../utils/screenfull';
@@ -6,7 +6,10 @@ import screenfull from '../utils/screenfull';
 const fullscreenHotKey = (hotKey: string | string[] = 'f'): HotKey => ({
   fn: () => {
     if (!screenfull.isEnabled) return;
-    const containerEl = document.querySelector('.' + PLAYER_CONTAINER_CLASS);
+    const containerElSelector = !isIOS
+      ? `.${PLAYER_CONTAINER_CLASS}`
+      : `.${PLAYER_CONTAINER_CLASS} video`;
+    const containerEl = document.querySelector(containerElSelector);
     if (!containerEl) return;
     if (!document.fullscreenElement) {
       screenfull.request(containerEl as HTMLElement).then(() => {
