@@ -85,9 +85,6 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
     const initPlayer = React.useCallback(
       async (source: Source) => {
         async function _initHlsPlayer() {
-          if (hls.current !== null) {
-            hls.current.destroy();
-          }
           const HlsSDK = await loadScript<typeof Hls>(
             HLS_SCRIPT_URL,
             HLS_VARIABLE_NAME
@@ -181,9 +178,6 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         }
         async function _initDashPlayer() {
           if (!innerRef.current) return;
-          if (dashjs.current !== null) {
-            dashjs.current.reset();
-          }
           const DashSDK = await loadScript<typeof DashJS>(
             DASH_SCRIPT_URL,
             DASH_VARIABLE_NAME
@@ -223,6 +217,12 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         }
         if (!innerRef.current) return;
         onInit?.(innerRef.current);
+        if (hls.current) {
+          hls.current.destroy();
+        }
+        if (dashjs.current) {
+          dashjs.current.reset();
+        }
         if (shouldPlayHls(source)) {
           _initHlsPlayer();
         } else if (shouldPlayDash(source)) {
@@ -240,6 +240,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
     );
     React.useEffect(() => {
       const _hls = hls.current;
+      const _dash = dashjs.current;
       const source =
         sources.find((source) => source.label === state?.currentQuality) ||
         sources[0];
@@ -250,8 +251,11 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         initQuality();
       }
       return () => {
-        if (_hls !== null) {
+        if (_hls) {
           _hls.destroy();
+        }
+        if (_dash) {
+          _dash.reset();
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
