@@ -1,4 +1,4 @@
-/* import React from 'react';
+import React from 'react';
 import { useVideoProps } from '../../../contexts/VideoPropsContext';
 import { useVideoState } from '../../../contexts/VideoStateContext';
 import AudioIcon from '../../icons/AudioIcon';
@@ -35,4 +35,4 @@ const AudioMenu = () => {
   ) : null;
 };
 
-export default React.memo(AudioMenu); */
+export default React.memo(AudioMenu);
