@@ -324,7 +324,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
       const currentAudio = state?.currentAudio;
       if (!currentAudio) return;
       const currentAudioTrack = state.audios.findIndex(
-        (audio) => audio.lang === currentAudio
+        (audio) => audio.language === currentAudio
       );
       hls.current.audioTrack = currentAudioTrack;
       // eslint-disable-next-line react-hooks/exhaustive-deps
