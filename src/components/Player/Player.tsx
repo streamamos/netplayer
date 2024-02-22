@@ -154,7 +154,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
                 audios: modifiedAudios,
                 currentAudio:
                   modifiedAudios[_hls.audioTrack >= 0 ? _hls.audioTrack : 0]
-                    ?.language,
+                    ?.lang,
               }));
             });
             _hls.on(Hls.Events.ERROR, function (event, data) {
@@ -324,7 +324,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
       const currentAudio = state?.currentAudio;
       if (!currentAudio) return;
       const currentAudioTrack = state.audios.findIndex(
-        (audio) => audio.language === currentAudio
+        (audio) => audio.lang === currentAudio
       );
       hls.current.audioTrack = currentAudioTrack;
       // eslint-disable-next-line react-hooks/exhaustive-deps
