@@ -18,17 +18,17 @@ const AudioMenu = () => {
       menuKey="audios"
       title={i18n.settings.audio}
       activeItemKey={
-        !state.currentAudio ? state?.audios?.[0]?.language : state.currentAudio
+        !state.currentAudio ? state?.audios?.[0]?.lang : state.currentAudio
       }
       icon={<AudioIcon />}
       onChange={handleAudioChange}
     >
       {state.audios.map((audio) => (
         <NestedMenu.Item
-          key={audio.language}
-          itemKey={audio.language}
+          key={audio.lang}
+          itemKey={audio.lang}
           title={audio.language}
-          value={audio.language}
+          value={audio.lang}
         />
       ))}
     </NestedMenu.SubMenu>
