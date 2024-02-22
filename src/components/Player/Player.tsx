@@ -154,7 +154,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
                 audios: modifiedAudios,
                 currentAudio:
                   modifiedAudios[_hls.audioTrack >= 0 ? _hls.audioTrack : 0]
-                    ?.lang,
+                    ?.language,
               }));
             });
             _hls.on(Hls.Events.ERROR, function (event, data) {
