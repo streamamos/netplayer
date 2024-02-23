@@ -7,7 +7,6 @@ import SettingsIcon from '../../icons/SettingsIcon';
 import NestedMenu from '../../NestedMenu';
 import Popover from '../../Popover';
 import ControlButton from '../ControlButton';
-import AudioMenu from './AudioMenu';
 import PlaybackSpeedMenu from './PlaybackSpeedMenu';
 import QualityMenu from './QualityMenu';
 import SubtitleMenu from './SubtitleMenu';
@@ -25,7 +24,6 @@ const Menu = React.memo(() => (
     <PlaybackSpeedMenu />
     <QualityMenu />
     <SubtitleMenu />
-    <AudioMenu />
   </NestedMenu>
 ));
 
