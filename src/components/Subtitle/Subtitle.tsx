@@ -22,9 +22,7 @@ const requestSubtitle = async (url: string): Promise<string | null> => {
   try {
     if (url.includes('vtt') || url.includes('srt')) {
       const response = await fetch(url);
-      const buffer = await response.arrayBuffer();
-      const decoder = new TextDecoder('utf-8');
-      const text = decoder.decode(buffer);
+      const text = await response.text();
       return text;
     }
     if (url.includes('m3u8')) {
