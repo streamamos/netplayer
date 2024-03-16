@@ -27,6 +27,21 @@ const SubtitleTextStyle: React.FC<Partial<SubMenuProps>> = (props) => {
         title="Outline"
         value="outline"
       ></NestedMenu.Item>
+      <NestedMenu.Item
+        itemKey="raised"
+        title="Raised"
+        value="raised"
+      ></NestedMenu.Item>
+      <NestedMenu.Item
+        itemKey="depressed"
+        title="Depressed"
+        value="depressed"
+      ></NestedMenu.Item>
+      <NestedMenu.Item
+        itemKey="dropShadow"
+        title="Drop Shadow"
+        value="dropShadow"
+      ></NestedMenu.Item>
     </NestedMenu.SubMenu>
   );
 };
