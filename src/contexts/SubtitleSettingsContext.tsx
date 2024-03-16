@@ -10,7 +10,7 @@ import React, {
 interface SubtitleSettings {
   fontSize: number;
   backgroundOpacity: number;
-  textStyle: 'none' | 'outline';
+  textStyle: 'none' | 'outline' | 'raised' | 'depressed' | 'dropShadow';
   fontOpacity: number;
 }
 
