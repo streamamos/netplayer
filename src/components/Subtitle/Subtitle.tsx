@@ -13,6 +13,9 @@ import styles from './Subtitle.module.css';
 const textStyles = {
   none: '',
   outline: `black 0px 0px 3px, black 0px 0px 3px, black 0px 0px 3px, black 0px 0px 3px, black 0px 0px 3px`,
+  raised: `black 0px 0px 5px, black 0px 1px 5px, black 0px 2px 5px`,
+  depressed: `black 0px -2px 1px`,
+  dropShadow: `black 0px 2px 1px`,
 };
 
 const BASE_FONT_SIZE = 16;
