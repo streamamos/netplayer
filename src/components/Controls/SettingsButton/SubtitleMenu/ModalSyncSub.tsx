@@ -14,11 +14,31 @@ const ModalSyncSub = ({ toggleModal }: any) => {
     useSubtitleSettings();
   const modalRef = useRef<HTMLDivElement>(null);
   const [delayTime, setDelayTime] = useState<string | number>(delayTimeSetting);
-  const handleApplyDelay = () => {
-    setDelayTimeSetting(Number(delayTime));
-    toggleModal();
+
+  // Update both local state and context immediately on change
+  const handleDelayChange = (value: string) => {
+    // Handle empty input or initial hyphen
+    if (value === '-' || value === '') {
+      setDelayTime(value);
+      return;
+    }
+
+    const regex = new RegExp('^[+-]?[0-9]+(?:\\.[0-9]+)?$');
+    if (regex.test(value)) {
+      const numericValue = Number(value);
+      setDelayTime(numericValue);
+      setDelayTimeSetting(numericValue); // Update context immediately
+    }
   };
+
+  // Update handlers for buttons to update both local state and context
+  const updateDelay = (newValue: number) => {
+    setDelayTime(newValue);
+    setDelayTimeSetting(newValue);
+  };
+
   useClickOutside(modalRef, toggleModal);
+
   return (
     <div className={styles.modal}>
       <div className={styles.modalOverlay}></div>
@@ -38,10 +58,10 @@ const ModalSyncSub = ({ toggleModal }: any) => {
               })}
         </span>
         <div className={styles.modalControl}>
-          <button onClick={() => setDelayTime(Number(delayTime) - 1000)}>
+          <button onClick={() => updateDelay(Number(delayTime) - 1000)}>
             <ArrowLeftIcon style={{ width: '1.3rem', height: '1.3rem' }} />
           </button>
-          <button onClick={() => setDelayTime(Number(delayTime) - 100)}>
+          <button onClick={() => updateDelay(Number(delayTime) - 100)}>
             <MinusIcon
               style={{ width: '1.6rem', height: '1.6rem', color: 'white' }}
             />
@@ -50,38 +70,20 @@ const ModalSyncSub = ({ toggleModal }: any) => {
             type="text"
             value={delayTime}
             className={styles.modalInput}
-            onChange={(e) => {
-              if (
-                e.target.value === '-' ||
-                delayTime === 0 ||
-                delayTime === ''
-              ) {
-                setDelayTime(e.target.value as any);
-              }
-              const regex = new RegExp('^[+-]?[0-9]+(?:\\.[0-9]+)?$');
-              if (e.target.value === '' || regex.test(e.target.value)) {
-                setDelayTime(e.target.value as any);
-              }
-            }}
+            onChange={(e) => handleDelayChange(e.target.value)}
           />
-          <button onClick={() => setDelayTime(Number(delayTime) + 100)}>
+          <button onClick={() => updateDelay(Number(delayTime) + 100)}>
             <IconPlus style={{ width: '1.6rem', height: '1.6rem' }} />
           </button>
-          <button onClick={() => setDelayTime(Number(delayTime) + 1000)}>
+          <button onClick={() => updateDelay(Number(delayTime) + 1000)}>
             <ArrowRightIcon style={{ width: '1.3rem', height: '1.3rem' }} />
           </button>
         </div>
-        <div className={styles.modalButtons}>
-          <button
-            className={styles.modalButtonApply}
-            onClick={handleApplyDelay}
-          >
-            {i18n.settings.apply}
-          </button>
+         {/* <div className={styles.modalButtons}>
           <button className={styles.modalButtonCancel} onClick={toggleModal}>
-            {i18n.settings.cancel}
+            {i18n.settings.close || i18n.settings.cancel}
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
