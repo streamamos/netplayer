@@ -37,6 +37,12 @@ const ModalSyncSub = ({ toggleModal }: any) => {
     setDelayTimeSetting(newValue);
   };
 
+  // Reset delay to 0
+  const handleReset = () => {
+    setDelayTime(0);
+    setDelayTimeSetting(0);
+  };
+
   useClickOutside(modalRef, toggleModal);
 
   return (
@@ -79,11 +85,17 @@ const ModalSyncSub = ({ toggleModal }: any) => {
             <ArrowRightIcon style={{ width: '1.3rem', height: '1.3rem' }} />
           </button>
         </div>
-         {/* <div className={styles.modalButtons}>
-          <button className={styles.modalButtonCancel} onClick={toggleModal}>
-            {i18n.settings.close || i18n.settings.cancel}
+         <div className={styles.modalButtons}>
+           <button
+            className={styles.modalButtonApply}
+            onClick={handleReset}
+          >
+            {i18n.settings.apply}
           </button>
-        </div> */}
+          <button className={styles.modalButtonCancel} onClick={toggleModal}>
+            {i18n.settings.cancel}
+          </button>
+        </div>
       </div>
     </div>
   );
