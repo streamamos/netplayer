@@ -1,4 +1,5 @@
 import { parse } from '@plussub/srt-vtt-parser';
+import ass2srt from 'ass-to-srt';
 import React, { useEffect, useMemo, useState } from 'react';
 import { isDesktop } from 'react-device-detect';
 import { buildAbsoluteURL } from 'url-toolkit';
@@ -23,6 +24,18 @@ const LINE_HEIHT_RATIO = 1.333;
 const M3U8_SUBTITLE_REGEX = /.*\.(vtt|srt)/g;
 const requestSubtitle = async (url: string): Promise<string | null> => {
   try {
+    if (url.includes('.ass')) {
+      const response = await fetch(url);
+      const buffer = await response.arrayBuffer();
+      const srtText = ass2srt(new TextDecoder('utf-8').decode(buffer)); // Initial decode for ASS conversion
+      // Decode the resulting SRT text
+      const decoderUtf8 = new TextDecoder('utf-8');
+      const decoderAnsi = new TextDecoder('windows-1252');
+      const textUtf8 = decoderUtf8.decode(new TextEncoder().encode(srtText));
+      const textAnsi = decoderAnsi.decode(new TextEncoder().encode(srtText));
+      const text = textUtf8.includes('�') ? textAnsi : textUtf8;
+      return text;
+    }
     if (url.includes('vtt') || url.includes('srt')) {
       const response = await fetch(url);
       const buffer = await response.arrayBuffer();
