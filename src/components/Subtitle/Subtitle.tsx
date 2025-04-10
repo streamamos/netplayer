@@ -1,5 +1,4 @@
 import { parse } from '@plussub/srt-vtt-parser';
-import ass2srt from 'ass-to-srt';
 import React, { useEffect, useMemo, useState } from 'react';
 import { isDesktop } from 'react-device-detect';
 import { buildAbsoluteURL } from 'url-toolkit';
@@ -10,6 +9,78 @@ import { useVideoState } from '../../contexts/VideoStateContext';
 import useTextScaling from '../../hooks/useTextScaling';
 import { classNames, isValidUrl } from '../../utils';
 import styles from './Subtitle.module.css';
+
+// Regular expressions for ASS parsing
+const re_ass = new RegExp(
+  'Dialogue:\\s\\d,' + // get time and subtitle
+  '(\\d+:\\d\\d:\\d\\d\\.\\d\\d),' + // start time
+  '(\\d+:\\d\\d:\\d\\d\\.\\d\\d),' + // end time
+  '([^,]*),' + // object
+  '([^,]*),' + // actor
+  '(?:[^,]*,){4}' +
+  '(.*)$',
+  'i'
+);
+const re_newline = /\\n/ig; // replace \N with newline
+const re_style = /\{[^}]+\}/g; // replace style
+
+// Custom ASS to SRT conversion function
+const convertAssToSrt = (assText: string): string => {
+  const srts: { start: string; end: string; text: string }[] = [];
+  
+  String(assText)
+    .split(/\r*\n/)
+    .forEach((line) => {
+      const m = line.match(re_ass);
+      if (!m) return;
+
+      const start = m[1];
+      const end = m[2];
+      const text = m[5].replace(re_style, '').replace(re_newline, '\r\n');
+      srts.push({ start, end, text });
+    });
+
+  let i = 1;
+  const output = srts
+    .sort((d1, d2) => {
+      const s1 = assTime2Int(d1.start);
+      const s2 = assTime2Int(d2.start);
+      const e1 = assTime2Int(d1.end);
+      const e2 = assTime2Int(d2.end);
+      return s1 !== s2 ? s1 - s2 : e1 - e2;
+    })
+    .map((srt) => {
+      const start = assTime2SrtTime(srt.start);
+      const end = assTime2SrtTime(srt.end);
+      return `${i++}\n${start} --> ${end}\n${srt.text}\n\n`;
+    })
+    .join('');
+
+  return output;
+};
+
+// Helper function to convert ASS time to integer for sorting
+const assTime2Int = (assTime: string): number => {
+  return parseInt(assTime.replace(/[^0-9]/g, ''));
+};
+
+// Helper function to convert ASS time format to SRT time format
+const assTime2SrtTime = (assTime: string): string => {
+  let h = '00',
+    m = '00',
+    s = '00',
+    ms = '000';
+  const t = assTime.split(':');
+  if (t.length > 0) h = t[0].length === 1 ? '0' + t[0] : t[0];
+  if (t.length > 1) m = t[1].length === 1 ? '0' + t[1] : t[1];
+  if (t.length > 2) {
+    const t2 = t[2].split('.');
+    if (t2.length > 0) s = t2[0].length === 1 ? '0' + t2[0] : t2[0];
+    if (t2.length > 1)
+      ms = t2[1].length === 2 ? '0' + t2[1] : t2[1].length === 1 ? '00' + t2[1] : t2[1];
+  }
+  return `${h}:${m}:${s},${ms}`;
+};
 
 const textStyles = {
   none: '',
@@ -24,18 +95,19 @@ const LINE_HEIHT_RATIO = 1.333;
 const M3U8_SUBTITLE_REGEX = /.*\.(vtt|srt)/g;
 const requestSubtitle = async (url: string): Promise<string | null> => {
   try {
-    if (url.includes('.ass')) {
-      const response = await fetch(url);
-      const buffer = await response.arrayBuffer();
-      const srtText = ass2srt(new TextDecoder('utf-8').decode(buffer)); // Initial decode for ASS conversion
-      // Decode the resulting SRT text
-      const decoderUtf8 = new TextDecoder('utf-8');
-      const decoderAnsi = new TextDecoder('windows-1252');
-      const textUtf8 = decoderUtf8.decode(new TextEncoder().encode(srtText));
-      const textAnsi = decoderAnsi.decode(new TextEncoder().encode(srtText));
-      const text = textUtf8.includes('�') ? textAnsi : textUtf8;
-      return text;
-    }
+  if (url.includes('.ass')) {
+        const response = await fetch(url);
+        const buffer = await response.arrayBuffer();
+        const initialText = new TextDecoder('utf-8').decode(buffer);
+        const srtText = convertAssToSrt(initialText);
+        // Apply encoding detection
+        const decoderUtf8 = new TextDecoder('utf-8');
+        const decoderAnsi = new TextDecoder('windows-1252');
+        const textUtf8 = decoderUtf8.decode(new TextEncoder().encode(srtText));
+        const textAnsi = decoderAnsi.decode(new TextEncoder().encode(srtText));
+        const text = textUtf8.includes('�') ? textAnsi : textUtf8;
+        return text;
+      }
     if (url.includes('vtt') || url.includes('srt')) {
       const response = await fetch(url);
       const buffer = await response.arrayBuffer();
