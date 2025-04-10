@@ -80,7 +80,8 @@
     "hls.js": "^1.5.20",
     "load-script": "^2.0.0",
     "react-device-detect": "^2.2.3",
-    "url-toolkit": "^2.2.5"
+    "url-toolkit": "^2.2.5",
+    "ass-to-srt": "^1.2.1"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
