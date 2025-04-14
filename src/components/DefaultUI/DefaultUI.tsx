@@ -45,7 +45,7 @@ const DefaultUI = React.forwardRef<HTMLVideoElement, NetPlayerProps>(
       }
       interactingTimeout.current = setTimeout(() => {
         setIsInteracting(false);
-      }, 3000);
+      }, 1000);
     }, [setIsInteracting]);
     const uiComponents = React.useMemo(
       () => ({
