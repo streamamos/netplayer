@@ -81,7 +81,7 @@ export interface ItemProps
   extends Omit<React.HTMLProps<HTMLLIElement>, 'onChange'> {
   parentMenuKey?: string;
   itemKey: string;
-  title: string;
+  title: React.ReactNode;
   activeItemKey?: string;
   value: string;
   onChange?: (value: string) => void;
@@ -89,7 +89,7 @@ export interface ItemProps
 
 export interface BaseItemProps
   extends Omit<React.HTMLAttributes<HTMLLIElement>, 'slot'> {
-  title: string;
+  title: React.ReactNode;
   isShown?: boolean;
   isActive?: boolean;
   activeIcon?: React.ReactNode;
