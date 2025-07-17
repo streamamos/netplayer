@@ -78,7 +78,7 @@ const NestedMenu = ({
 };
 
 export interface ItemProps
-  extends Omit<React.HTMLProps<HTMLLIElement>, 'onChange'> {
+  extends Omit<React.HTMLProps<HTMLLIElement>, 'onChange' | 'title'> {
   parentMenuKey?: string;
   itemKey: string;
   title: React.ReactNode;
@@ -88,7 +88,7 @@ export interface ItemProps
 }
 
 export interface BaseItemProps
-  extends Omit<React.HTMLAttributes<HTMLLIElement>, 'slot'> {
+  extends Omit<React.HTMLAttributes<HTMLLIElement>, 'slot' | 'title'> {
   title: React.ReactNode;
   isShown?: boolean;
   isActive?: boolean;
