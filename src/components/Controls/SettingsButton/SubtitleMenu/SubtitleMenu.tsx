@@ -10,7 +10,7 @@ const getLangSVG = (lang: string) => {
   if (upperLang.includes('PT v')) {
     return (
       <img
-        src="https://flagicons.lipis.dev/flags/4x3/pt.svg"
+        src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Emojione_1F1F5-1F1F9.svg"
         alt="PT"
         style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }}
       />
@@ -19,7 +19,7 @@ const getLangSVG = (lang: string) => {
   if (upperLang.includes('BR v')) {
     return (
       <img
-        src="https://flagicons.lipis.dev/flags/4x3/br.svg"
+        src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Emojione_1F1F7-1F1F7.svg"
         alt="PT-BR"
         style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }}
       />
@@ -28,7 +28,7 @@ const getLangSVG = (lang: string) => {
   if (upperLang.includes('EN v')) {
     return (
       <img
-        src="https://flagicons.lipis.dev/flags/4x3/gb.svg"
+        src="https://upload.wikimedia.org/wikipedia/commons/8/83/Emojione_1F1EC-1F1E7.svg"
         alt="EN"
         style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }}
       />
