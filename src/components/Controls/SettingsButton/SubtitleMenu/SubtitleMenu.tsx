@@ -76,7 +76,7 @@ const SubtitleMenu = () => {
           title={
             <span style={{ display: 'flex', alignItems: 'center' }}>
               {getLangSVG(subtitle.lang)}
-              {subtitle.language}
+              <p>{subtitle.language}</p>
             </span>
           }
           value={subtitle.lang}
