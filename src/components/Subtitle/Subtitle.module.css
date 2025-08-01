@@ -12,6 +12,10 @@
 .container.interacting {
   bottom: 6rem;
 }
+.container.an8Style {
+  top: 30px!important;
+  bottom: auto!important;
+}
 .text {
   width: fit-content;
   color: white;
