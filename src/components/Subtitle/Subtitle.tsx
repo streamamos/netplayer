@@ -211,9 +211,9 @@ const Subtitle = () => {
     <div
       className={classNames(
         styles.container,
-        isInteracting && isDesktop && styles.interacting
+        isInteracting && isDesktop && styles.interacting,
+        hasAn8 && styles.an8Style
       )}
-      style={hasAn8 ? { bottom: 'revert', top: '30px' } : {}}
     >
       <p
         className={classNames(styles.text)}
