@@ -12,21 +12,21 @@ import styles from './Subtitle.module.css';
 
 // Regular expressions for ASS parsing
 const re_ass = new RegExp(
-  'Dialogue:\\s\\d,' + // get time and subtitle
-  '(\\d+:\\d\\d:\\d\\d\\.\\d\\d),' + // start time
-  '(\\d+:\\d\\d:\\d\\d\\.\\d\\d),' + // end time
-  '([^,]*),' + // object
-  '([^,]*),' + // actor
+  'Dialogue:\\s\\d,' +
+  '(\\d+:\\d\\d:\\d\\d\\.\\d\\d),' +
+  '(\\d+:\\d\\d:\\d\\d\\.\\d\\d),' +
+  '([^,]*),' +
+  '([^,]*),' +
   '(?:[^,]*,){4}' +
   '(.*)$',
   'i'
 );
-const re_newline = /\\n/ig; // replace \N with newline
-const re_style = /\{[^}]+\}/g; // replace style
+const re_newline = /\\n/ig;
+const re_an8 = /{\\an8}/g; // Regex to detect {\an8}
 
 // Custom ASS to SRT conversion function
 const convertAssToSrt = (assText: string): string => {
-  const srts: { start: string; end: string; text: string }[] = [];
+  const srts: { start: string; end: string; text: string; hasAn8: boolean }[] = [];
   
   String(assText)
     .split(/\r*\n/)
@@ -36,8 +36,10 @@ const convertAssToSrt = (assText: string): string => {
 
       const start = m[1];
       const end = m[2];
-      const text = m[5].replace(re_style, '').replace(re_newline, '\r\n');
-      srts.push({ start, end, text });
+      const rawText = m[5];
+      const hasAn8 = re_an8.test(rawText);
+      const text = rawText.replace(re_an8, '').replace(re_newline, '\r\n');
+      srts.push({ start, end, text, hasAn8 });
     });
 
   let i = 1;
@@ -52,6 +54,7 @@ const convertAssToSrt = (assText: string): string => {
     .map((srt) => {
       const start = assTime2SrtTime(srt.start);
       const end = assTime2SrtTime(srt.end);
+      // Store hasAn8 as a data attribute or similar if needed
       return `${i++}\n${start} --> ${end}\n${srt.text}\n\n`;
     })
     .join('');
@@ -95,19 +98,18 @@ const LINE_HEIHT_RATIO = 1.333;
 const M3U8_SUBTITLE_REGEX = /.*\.(vtt|srt)/g;
 const requestSubtitle = async (url: string): Promise<string | null> => {
   try {
-  if (url.includes('.ass')) {
-        const response = await fetch(url);
-        const buffer = await response.arrayBuffer();
-        const initialText = new TextDecoder('utf-8').decode(buffer);
-        const srtText = convertAssToSrt(initialText);
-        // Apply encoding detection
-        const decoderUtf8 = new TextDecoder('utf-8');
-        const decoderAnsi = new TextDecoder('windows-1252');
-        const textUtf8 = decoderUtf8.decode(new TextEncoder().encode(srtText));
-        const textAnsi = decoderAnsi.decode(new TextEncoder().encode(srtText));
-        const text = textUtf8.includes('�') ? textAnsi : textUtf8;
-        return text;
-      }
+    if (url.includes('.ass')) {
+      const response = await fetch(url);
+      const buffer = await response.arrayBuffer();
+      const initialText = new TextDecoder('utf-8').decode(buffer);
+      const srtText = convertAssToSrt(initialText);
+      const decoderUtf8 = new TextDecoder('utf-8');
+      const decoderAnsi = new TextDecoder('windows-1252');
+      const textUtf8 = decoderUtf8.decode(new TextEncoder().encode(srtText));
+      const textAnsi = decoderAnsi.decode(new TextEncoder().encode(srtText));
+      const text = textUtf8.includes('�') ? textAnsi : textUtf8;
+      return text;
+    }
     if (url.includes('vtt') || url.includes('srt')) {
       const response = await fetch(url);
       const buffer = await response.arrayBuffer();
@@ -143,12 +145,14 @@ const Subtitle = () => {
   const { videoEl } = useVideo();
   const { isInteracting } = useInteract();
   const [currentText, setCurrentText] = useState<string>('');
+  const [hasAn8, setHasAn8] = useState<boolean>(false);
   const [subtitleText, setSubtitleText] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const subtitle = useMemo(
     () => state.subtitles?.find((sub) => sub.lang === state.currentSubtitle),
     [state.subtitles, state.currentSubtitle]
   );
+
   useEffect(() => {
     if (!subtitle?.file) return;
     const getSubtitle = async () => {
@@ -160,6 +164,7 @@ const Subtitle = () => {
     };
     getSubtitle();
   }, [subtitle]);
+
   useEffect(() => {
     if (!videoEl) return;
     let handleSubtitle: () => void = () => {};
@@ -173,7 +178,14 @@ const Subtitle = () => {
             entry.from <= currentTime + delayTime * -1 &&
             entry.to >= currentTime + delayTime * -1
         );
-        setCurrentText(currentEntry?.text || '');
+        if (currentEntry) {
+          const cleanedText = currentEntry.text.replace(re_an8, '');
+          setCurrentText(cleanedText);
+          setHasAn8(re_an8.test(currentEntry.text));
+        } else {
+          setCurrentText('');
+          setHasAn8(false);
+        }
       };
       videoEl.addEventListener('timeupdate', handleSubtitle);
     } catch (error) {
@@ -182,22 +194,26 @@ const Subtitle = () => {
     return () => {
       videoEl.removeEventListener('timeupdate', handleSubtitle);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subtitleText, delayTime]);
+  }, [subtitleText, delayTime, videoEl]);
+
   const fontSize = useMemo(() => {
     return moderateScale(subtitleSettings.fontSize * BASE_FONT_SIZE);
   }, [moderateScale, subtitleSettings.fontSize]);
+
   const lineHeight = useMemo(() => {
     return fontSize * LINE_HEIHT_RATIO;
   }, [fontSize]);
+
   if (isLoading || !subtitle?.file || !currentText || state.isSubtitleDisabled)
     return null;
+
   return (
     <div
       className={classNames(
         styles.container,
         isInteracting && isDesktop && styles.interacting
       )}
+      style={hasAn8 ? { bottom: 'auto !important', top: '30px' } : {}}
     >
       <p
         className={classNames(styles.text)}
