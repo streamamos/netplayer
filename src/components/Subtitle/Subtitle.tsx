@@ -213,7 +213,7 @@ const Subtitle = () => {
         styles.container,
         isInteracting && isDesktop && styles.interacting
       )}
-      style={hasAn8 ? { bottom: 'auto!important', top: '30px' } : {}}
+      style={hasAn8 ? { bottom: 'revert', top: '30px' } : {}}
     >
       <p
         className={classNames(styles.text)}
