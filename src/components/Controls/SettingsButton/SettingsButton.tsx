@@ -12,14 +12,9 @@ import { useVideoState } from '../../../contexts/VideoStateContext';
 import { useVideo } from '../../../contexts/VideoContext';
 import { useSubtitleSettings, defaultSubtitleSettings } from '../../../contexts/SubtitleSettingsContext';
 import SubtitleIcon from '../../icons/SubtitleIcon';
-import AudioIcon from '../../icons/AudioIcon';
 import QualityIcon from '../../icons/QualityIcon';
 import PlaybackSpeedIcon from '../../icons/PlaybackSpeedIcon';
 import CheckIcon from '../../icons/CheckIcon';
-import SubtitleFontSize from './SubtitleMenu/SubtitleFontSize';
-import SubtitleBackgroundOpacity from './SubtitleMenu/SubtitleBackgroundOpacity';
-import SubtitleTextStyle from './SubtitleMenu/SubtitleTextStyle';
-import SubtitleFontOpacity from './SubtitleMenu/SubtitleFontOpacity';
 import ModalSyncSub from './SubtitleMenu/ModalSyncSub';
 import SubtitleUpload from './SubtitleMenu/SubtitleUpload';
 
@@ -27,7 +22,6 @@ import SubtitleUpload from './SubtitleMenu/SubtitleUpload';
 const SubtitleContent = () => {
   const { state, setState } = useVideoState();
   const { i18n } = useVideoProps();
-  const { setState: setSubtitleSettings, setDelayTime } = useSubtitleSettings();
   
   const handleSubtitleChange = (value: string) => {
     if (value === 'off') {
@@ -118,42 +112,8 @@ const SubtitleContent = () => {
   );
 };
 
-const AudioContent = () => {
-  const { state, setState } = useVideoState();
-  const { i18n } = useVideoProps();
-  
-  const handleAudioChange = (value: string) => {
-    setState((prev) => ({
-      ...prev,
-      currentAudio: value,
-    }));
-  };
-
-  const activeAudio = !state.currentAudio ? state?.audios?.[0]?.lang : state.currentAudio;
-
-  return (
-    <div className={styles.directMenuContent}>
-      {state.audios.map((audio) => (
-        <div
-          key={audio.lang}
-          className={`${styles.menuItem} ${activeAudio === audio.lang ? styles.activeMenuItem : ''}`}
-          onClick={() => handleAudioChange(audio.lang)}
-        >
-          {activeAudio === audio.lang && (
-            <span className={styles.menuItemCheckIcon}>
-              <CheckIcon />
-            </span>
-          )}
-          <span>{audio.language}</span>
-        </div>
-      ))}
-    </div>
-  );
-};
-
 const QualityContent = () => {
   const { state, setState } = useVideoState();
-  const { i18n } = useVideoProps();
   
   const handleQualityChange = (value: string) => {
     setState(() => ({ currentQuality: value }));
@@ -183,7 +143,6 @@ const QualityContent = () => {
 
 const PlaybackSpeedContent = () => {
   const { videoEl } = useVideo();
-  const { i18n } = useVideoProps();
   const speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
   const currentSpeed = videoEl?.playbackRate || 1;
   
