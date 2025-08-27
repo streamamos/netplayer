@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useState } from 'react';
 import { useVideoProps, useVideoState } from '../../../../contexts';
 import NestedMenu from '../../../NestedMenu';
-import SettingsIcon from '../../../icons/SettingsIcon';
+import UploadIcon from '../../../icons/UploadIcon';
 import styles from './index.module.css';
 
 const SubtitleUpload = (props: any) => {
@@ -44,7 +44,7 @@ const SubtitleUpload = (props: any) => {
       itemKey="subtitle_upload"
       title={
         <>
-          <SettingsIcon /> {i18n.settings.uploadSubtitle}
+          <UploadIcon /> {i18n.settings.uploadSubtitle}
         </>
       }
       onChange={() => {}}
