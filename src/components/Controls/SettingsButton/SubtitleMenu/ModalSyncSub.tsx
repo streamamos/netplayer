@@ -1,9 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { useSubtitleSettings, useVideoProps } from '../../../../contexts';
+import { useSubtitleSettings } from '../../../../contexts';
 import useClickOutside from '../../../../hooks/useClickOutside';
-import { stringInterpolate } from '../../../../utils';
-import ArrowLeftIcon from '../../../icons/ArrowLeftIcon';
-import ArrowRightIcon from '../../../icons/ArrowRightIcon';
 import IconMinusCircle from '../../../icons/MinusCircleIcon';
 import IconPlusCircle from '../../../icons/PlusIconCircle';
 import IconPlus from '../../../icons/IconPlus';
@@ -11,7 +8,6 @@ import MinusIcon from '../../../icons/MinusIcon';
 import styles from './index.module.css';
 
 const ModalSyncSub = ({ toggleModal }: any) => {
-  const { i18n } = useVideoProps();
   const { delayTime: delayTimeSetting, setDelayTime: setDelayTimeSetting } =
     useSubtitleSettings();
   const modalRef = useRef<HTMLDivElement>(null);
@@ -37,12 +33,6 @@ const ModalSyncSub = ({ toggleModal }: any) => {
   const updateDelay = (newValue: number) => {
     setDelayTime(newValue);
     setDelayTimeSetting(newValue);
-  };
-
-  // Reset delay to 0
-  const handleReset = () => {
-    setDelayTime(0);
-    setDelayTimeSetting(0);
   };
 
   useClickOutside(modalRef, toggleModal);
