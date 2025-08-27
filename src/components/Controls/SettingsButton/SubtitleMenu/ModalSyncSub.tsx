@@ -1,16 +1,14 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useSubtitleSettings } from '../../../../contexts';
-import useClickOutside from '../../../../hooks/useClickOutside';
 import IconMinusCircle from '../../../icons/MinusCircleIcon';
 import IconPlusCircle from '../../../icons/PlusIconCircle';
 import IconPlus from '../../../icons/IconPlus';
 import MinusIcon from '../../../icons/MinusIcon';
 import styles from './index.module.css';
 
-const ModalSyncSub = ({ toggleModal }: any) => {
+const ModalSyncSub = () => {
   const { delayTime: delayTimeSetting, setDelayTime: setDelayTimeSetting } =
     useSubtitleSettings();
-  const modalRef = useRef<HTMLDivElement>(null);
   const [delayTime, setDelayTime] = useState<string | number>(delayTimeSetting);
 
   // Update both local state and context immediately on change
@@ -35,12 +33,10 @@ const ModalSyncSub = ({ toggleModal }: any) => {
     setDelayTimeSetting(newValue);
   };
 
-  useClickOutside(modalRef, toggleModal);
-
   return (
     <div className={styles.modal}>
       <div className={styles.modalOverlay}></div>
-      <div className={styles.modalContainer} ref={modalRef}>
+      <div className={styles.modalContainer}>
         {/* <h2 className={styles.modalHeading}>
           {i18n.settings.subtitleSyncHeading}
         </h2>
