@@ -1,0 +1,7 @@
+.container {
+  display: flex;
+  align-items: center;
+}
+.container > * + * {
+  margin-left: 0.25rem;
+}
