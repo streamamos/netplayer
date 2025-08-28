@@ -38,7 +38,9 @@
   background-color: rgba(255, 255, 255, 0.2);
 }
 .baseItemTitle {
-  padding-left: 2rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 }
 .activeIconContainer {
   position: absolute;

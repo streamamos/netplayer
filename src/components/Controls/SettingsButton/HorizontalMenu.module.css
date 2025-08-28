@@ -117,6 +117,10 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.subtitleSettingsSection {
+  padding: 5px;
+}
+
 .settingsSection:last-child {
   border-bottom: none;
 }
@@ -125,11 +129,14 @@
   color: #e5e7eb;
   font-size: 0.875rem;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .optionsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
   gap: 0.5rem;
 }
 

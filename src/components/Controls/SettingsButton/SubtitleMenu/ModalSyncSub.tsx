@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSubtitleSettings } from '../../../../contexts';
+import { useSubtitleSettings, useVideoProps } from '../../../../contexts';
 import IconMinusCircle from '../../../icons/MinusCircleIcon';
 import IconPlusCircle from '../../../icons/PlusIconCircle';
 import IconPlus from '../../../icons/IconPlus';
@@ -7,6 +7,7 @@ import MinusIcon from '../../../icons/MinusIcon';
 import styles from './index.module.css';
 
 const ModalSyncSub = () => {
+  const { i18n } = useVideoProps();
   const { delayTime: delayTimeSetting, setDelayTime: setDelayTimeSetting } =
     useSubtitleSettings();
   const [delayTime, setDelayTime] = useState<string | number>(delayTimeSetting);
@@ -33,24 +34,16 @@ const ModalSyncSub = () => {
     setDelayTimeSetting(newValue);
   };
 
+  // Reset delay to 0
+  const handleReset = () => {
+    setDelayTime(0);
+    setDelayTimeSetting(0);
+  };
+
   return (
     <div className={styles.modal}>
       <div className={styles.modalOverlay}></div>
       <div className={styles.modalContainer}>
-        {/* <h2 className={styles.modalHeading}>
-          {i18n.settings.subtitleSyncHeading}
-        </h2>
-        <span className={styles.modalTitle}>
-          {Number(delayTime) === 0
-            ? i18n.settings.subtitleSyncNoDelay
-            : Number(delayTime) > 0
-            ? stringInterpolate(i18n.settings.tooEarly, {
-                miliseconds: Number(delayTime),
-              })
-            : stringInterpolate(i18n.settings.tooLate, {
-                miliseconds: Number(delayTime),
-              })}
-        </span> */}
         <div className={styles.modalControl}>
           <button onClick={() => updateDelay(Number(delayTime) - 1000)}>
             <IconMinusCircle style={{ width: '1.3rem', height: '1.3rem' }} />
@@ -73,17 +66,14 @@ const ModalSyncSub = () => {
             <IconPlusCircle style={{ width: '1.3rem', height: '1.3rem' }} />
           </button>
         </div>
-         {/* <div className={styles.modalButtons}>
+         <div className={styles.modalButtons}>
            <button
             className={styles.modalButtonApply}
             onClick={handleReset}
           >
             {i18n.settings.apply}
           </button>
-          <button className={styles.modalButtonCancel} onClick={toggleModal}>
-            {i18n.settings.cancel}
-          </button>
-        </div> */}
+        </div>
       </div>
     </div>
   );

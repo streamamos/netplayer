@@ -9,7 +9,7 @@ const PlaybackSpeedIcon = (props: SVGProps<SVGSVGElement>) => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className="Hawkins-Icon Hawkins-Icon-Standard"
-    style={{ width: '100%', height: '100%' }}
+    style={{ width: '18px', height: '18px' }}
     {...props}
   >
     <path
