@@ -25,10 +25,28 @@ import ModalSyncSub from './SubtitleMenu/ModalSyncSub';
 import SubtitleUpload from './SubtitleMenu/SubtitleUpload';
 
 // Direct content components that bypass the NestedMenu navigation
-const SubtitleContent = () => {
+const SubtitleContent = ({ scrollToSubtitle }: { scrollToSubtitle: () => void }) => {
   const { state, setState } = useVideoState();
   const { i18n } = useVideoProps();
-  
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const checkSubtitles = () => {
+      if (state.subtitles && state.subtitles.length > 0) {
+        setLoading(false);
+      }
+    };
+
+    const interval = setInterval(checkSubtitles, 50);
+    return () => clearInterval(interval);
+  }, [state.subtitles]);
+
+  React.useEffect(() => {
+    if (!loading) {
+      scrollToSubtitle();
+    }
+  }, [loading]);
+
   const handleSubtitleChange = (value: string) => {
     if (value === 'off') {
       setState((prev) => ({
@@ -81,13 +99,12 @@ const SubtitleContent = () => {
     ? state?.subtitles?.[0]?.lang
     : state.currentSubtitle;
 
-
   return (
     <div className={styles.directMenuContent}>
-      
       <div 
         className={`${styles.menuItem} ${activeSubtitle === 'off' ? styles.activeMenuItem : ''}`}
         onClick={() => handleSubtitleChange('off')}
+        data-lang="off"
       >
         {activeSubtitle === 'off' && (
           <span className={styles.menuItemCheckIcon}>
@@ -96,24 +113,29 @@ const SubtitleContent = () => {
         )}
         <span>{i18n.settings.off}</span>
       </div>
-      {state.subtitles.map((subtitle) => (
-        <div
-          key={subtitle.lang}
-          className={`${styles.menuItem} ${activeSubtitle === subtitle.lang ? styles.activeMenuItem : ''}`}
-          onClick={() => handleSubtitleChange(subtitle.lang)}
-        >
-          {activeSubtitle === subtitle.lang && (
-            <span className={styles.menuItemCheckIcon}>
-              <CheckIcon />
+      {loading ? (
+        <div className={styles.loader}>{i18n.settings.loading}</div>
+      ) : (
+        state.subtitles.map((subtitle) => (
+          <div
+            key={subtitle.lang}
+            className={`${styles.menuItem} ${activeSubtitle === subtitle.lang ? styles.activeMenuItem : ''}`}
+            onClick={() => handleSubtitleChange(subtitle.lang)}
+            data-lang={subtitle.lang}
+          >
+            {activeSubtitle === subtitle.lang && (
+              <span className={styles.menuItemCheckIcon}>
+                <CheckIcon />
+              </span>
+            )}
+            <span style={{ display: 'flex', alignItems: 'center' }}>
+              {getLangSVG(subtitle.lang)}
+              <p>{subtitle.language}</p>
             </span>
-          )}
-          <span style={{ display: 'flex', alignItems: 'center' }}>
-            {getLangSVG(subtitle.lang)}
-            <p>{subtitle.language}</p>
-          </span>
-        </div>
-      ))}
-              <SubtitleUpload />
+          </div>
+        ))
+      )}
+      <SubtitleUpload />
     </div>
   );
 };
@@ -288,6 +310,29 @@ const SubtitleSettingsContent = () => {
 const HorizontalMenu = React.memo(() => {
   const { i18n } = useVideoProps();
   const [activeTab, setActiveTab] = React.useState('subtitles');
+  const contentRef = React.useRef<HTMLDivElement>(null);
+
+  const scrollToSubtitle = () => {
+    if (contentRef.current) {
+      const selectedSubtitle = contentRef.current.querySelector(`.${styles.activeMenuItem}`);
+      if (selectedSubtitle) {
+        selectedSubtitle.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        contentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  };
+
+  const handleTabChange = (tabKey: string) => {
+    setActiveTab(tabKey);
+    if (contentRef.current) {
+        if (tabKey === 'subtitles') {
+            setTimeout(() => scrollToSubtitle(), 50); // Adding a slight delay to ensure DOM updates
+        } else {
+            contentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+};
 
   const tabs = [
     { key: 'subtitles', label: i18n.settings.subtitle, icon: <SubtitleIcon /> },
@@ -311,15 +356,15 @@ const HorizontalMenu = React.memo(() => {
           <div
             key={tab.key}
             className={`${styles.tab} ${activeTab === tab.key ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => handleTabChange(tab.key)}
           >
             {tab.icon && <span className={styles.tabIcon}>{tab.icon}</span>}
             {tab.label}
           </div>
         ))}
       </div>
-      <div className={styles.contentContainer}>
-        {activeTab === 'subtitles' && <SubtitleContent />}
+      <div ref={contentRef} className={styles.contentContainer}>
+        {activeTab === 'subtitles' && <SubtitleContent scrollToSubtitle={scrollToSubtitle} />}
         {activeTab === 'settings' && <SubtitleSettingsContent />}
         {activeTab === 'quality' && <QualityContent />}
       </div>

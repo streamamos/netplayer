@@ -123,6 +123,7 @@ const defaultI18n: I18n = {
     tooLate: 'Use this if subtitles are shown {{miliseconds}} ms too late',
     uploadSubtitle: 'Upload Subtitle',
     mySubtitle: 'My subtitle',
+    loading: '',
   },
 };
 
