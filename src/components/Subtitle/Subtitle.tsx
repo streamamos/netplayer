@@ -157,9 +157,14 @@ const Subtitle = () => {
     if (!subtitle?.file) return;
     const getSubtitle = async () => {
       setIsLoading(true);
+      setCurrentText("");
       const text = await requestSubtitle(subtitle.file);
       setIsLoading(false);
-      if (!text) return;
+      if (!text) {
+        setCurrentText(">> <i><b>Algo correu mal, escolhe outra legenda ou tenta novamente mais tarde.</b></i> <<");
+        setSubtitleText("");
+        return;
+      };
       setSubtitleText(text);
     };
     getSubtitle();
@@ -190,6 +195,7 @@ const Subtitle = () => {
       videoEl.addEventListener('timeupdate', handleSubtitle);
     } catch (error) {
       console.log('error: ', error);
+      setCurrentText(">> <i><b>Algo correu mal, escolhe outra legenda ou tenta novamente mais tarde.</b></i> <<");
     }
     return () => {
       videoEl.removeEventListener('timeupdate', handleSubtitle);

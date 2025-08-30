@@ -11,19 +11,19 @@ const App: React.FC = () => {
       ]}
         subtitles={[
           {
-            lang: "(PT v1) PORTUGUESE",
-            language: "(PT v1) PORTUGUESE",
+            lang: "(PT v1) TWD1X1",
+            language: "(PT v1) TWD1X1",
+            file: "https://sub.wyzie.ru/c/19e10c61/id/1952597846?format=srt&encoding=CP1252",
+          },
+          {
+            lang: "(EN v1) TWD1X1",
+            language: "(EN v1) TWD1X1",
             file: "https://sub.wyzie.ru/c/19b00c55/id/1961741348?format=srt&encoding=UTF-8",
           },
           {
-            lang: "(PT BR v1) PORTUGUESE",
-            language: "(PT BR v1) PORTUGUESE",
-            file: "https://dl.opensubtitles.org/en/download/src-api/vrf-19bc0c59/file/1961607936.ass",
-          },
-          {
-            lang: "(EN v1) PORTUGUESE",
-            language: "(EN v1) PORTUGUESE",
-            file: "https://dl.opensubtitles.org/en/download/src-api/vrf-19bc0c59/file/1961607936.ass",
+            lang: "(PT BR v1) ERROR",
+            language: "(PT BR v1) ERROR",
+            file: "https://sub.wyzie.ru/c/19a50c51/id/1952608045?format=srt&encoding=CP1252",
           }
         ]}
       className="object-contain w-full h-full"
