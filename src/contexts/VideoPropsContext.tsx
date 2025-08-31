@@ -37,6 +37,11 @@ interface I18nSettings extends I18nField {
   subtitleBackgroundOpacity: string;
   subtitleFontOpacity: string;
   subtitleFontSize: string;
+  subtitleTextColor: string;
+  white: string;
+  yellow: string;
+  red: string;
+  lightBlue: string;
   audio: string;
   subtitleSync: string;
   subtitleSyncNoDelay: string;
@@ -124,6 +129,11 @@ const defaultI18n: I18n = {
     uploadSubtitle: 'Upload Subtitle',
     mySubtitle: 'My subtitle',
     loading: '',
+    subtitleTextColor: 'Text Color',
+    white: 'White',
+    yellow: 'Yellow',
+    red: 'Red',
+    lightBlue: 'Light Blue',
   },
 };
 

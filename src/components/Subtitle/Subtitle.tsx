@@ -6,6 +6,7 @@ import { useSubtitleSettings } from '../../contexts/SubtitleSettingsContext';
 import { useVideo } from '../../contexts/VideoContext';
 import { useInteract } from '../../contexts/VideoInteractingContext';
 import { useVideoState } from '../../contexts/VideoStateContext';
+import { colorToRgba } from '../../utils/color';
 import useTextScaling from '../../hooks/useTextScaling';
 import { classNames, isValidUrl } from '../../utils';
 import styles from './Subtitle.module.css';
@@ -227,7 +228,7 @@ const Subtitle = () => {
           fontSize: fontSize + 'px',
           lineHeight: lineHeight + 'px',
           backgroundColor: `rgba(0, 0, 0, ${subtitleSettings.backgroundOpacity})`,
-          color: `rgba(255, 255, 255, ${subtitleSettings.fontOpacity})`,
+          color: colorToRgba(subtitleSettings.textColor, subtitleSettings.fontOpacity),
           textShadow: textStyles[subtitleSettings.textStyle],
         }}
         dangerouslySetInnerHTML={{ __html: currentText }}

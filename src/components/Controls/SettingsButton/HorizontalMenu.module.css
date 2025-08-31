@@ -153,6 +153,12 @@
   transform: translateY(-50%);
 }
 
+.colorPreview {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
 .loader {
   width: 12px;
   height: 12px;

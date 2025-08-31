@@ -19,10 +19,12 @@ import FontSizeIcon from '../../icons/FontSizeIcon';
 import OpacityIcon from '../../icons/OpacityIcon';
 import FontStyleIcon from '../../icons/FontStyleIcon';
 import FontOpacityIcon from '../../icons/FontOpacityIcon';
-
+import ColorIcon from '../../icons/ColorIcon';
 import CheckIcon from '../../icons/CheckIcon';
 import ModalSyncSub from './SubtitleMenu/ModalSyncSub';
 import SubtitleUpload from './SubtitleMenu/SubtitleUpload';
+
+import { colorToRgba } from '../../../utils/color';
 
 // Direct content components that bypass the NestedMenu navigation
 const SubtitleContent = ({ scrollToSubtitle }: { scrollToSubtitle: () => void }) => {
@@ -180,6 +182,13 @@ const SubtitleSettingsContent = () => {
   const speeds = [0.25, 1, 1.5, 2];
   const currentSpeed = videoEl?.playbackRate || 1;
 
+  const colors = [
+    { key: 'white', label: i18n.settings.white, style: { color: 'white' } },
+    { key: 'yellow', label: i18n.settings.yellow, style: { color: 'yellow' } },
+    { key: 'red', label: i18n.settings.red, style: { color: 'red' } },
+    { key: 'lightBlue', label: i18n.settings.lightBlue, style: { color: 'lightblue' } },
+  ];
+
   const handleChangeSpeed = (value: number) => {
     if (!videoEl) return;
     videoEl.playbackRate = value;
@@ -233,6 +242,24 @@ const SubtitleSettingsContent = () => {
                 <span className={styles.menuItemCheckIcon}></span>
               )}
               <span>{`${size * 100}%`}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+            <div className={styles.settingsSection}>
+        <div className={styles.sectionTitle}><ColorIcon />{i18n.settings.subtitleTextColor}</div>
+        <div className={styles.optionsGrid}>
+          {colors.map((color) => (
+            <div
+              key={color.key}
+              className={`${styles.menuItem} ${state.textColor === color.key ? styles.activeMenuItem : ''}`}
+              onClick={() => setState(() => ({ textColor: color.key as any }))}
+            >
+              {state.textColor === color.key && (
+                <span className={styles.menuItemCheckIcon}></span>
+              )}
+              <span style={{ backgroundColor: colorToRgba(color.style.color, 1) }} className={styles.colorPreview}></span>
             </div>
           ))}
         </div>
