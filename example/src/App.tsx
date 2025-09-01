@@ -6,8 +6,29 @@ const App: React.FC = () => {
     <NetPlayer
       sources={[
         {
-          file: `https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8`
-        }
+          file: `https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8`,
+          label: 'auto'
+        },
+        {
+          file: `https://test-streams.mux.dev/x36xhzz/url_8/193039199_mp4_h264_aac_fhd_7.m3u8`,
+          label: '1080'
+        },
+        {
+          file: `https://test-streams.mux.dev/x36xhzz/url_0/193039199_mp4_h264_aac_hd_7.m3u8`,
+          label: '720'
+        },
+        {
+          file: `https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8`,
+          label: '480'
+        },
+        {
+          file: `https://test-streams.mux.dev/x36xhzz/url_4/193039199_mp4_h264_aac_7.m3u8`,
+          label: '288'
+        },
+        {
+          file: `https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8`,
+          label: '184'
+        },
       ]}
         subtitles={[
           {

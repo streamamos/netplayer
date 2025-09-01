@@ -144,6 +144,7 @@ const SubtitleContent = ({ scrollToSubtitle }: { scrollToSubtitle: () => void })
 
 const QualityContent = () => {
   const { state, setState } = useVideoState();
+  const { i18n } = useVideoProps();
   
   const handleQualityChange = (value: string) => {
     setState(() => ({ currentQuality: value }));
@@ -165,6 +166,8 @@ const QualityContent = () => {
             </span>
           )}
           <span>{quality}</span>
+          {quality === 'auto' && <p className={styles.qualityLabel}>{i18n.settings.recommended}</p>}
+          {parseInt(quality) > 720 && <p className={styles.qualityLabel}>{i18n.settings.hd}</p>}
         </div>
       ))}
     </div>

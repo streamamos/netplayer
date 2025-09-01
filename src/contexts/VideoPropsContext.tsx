@@ -29,6 +29,8 @@ interface I18nSettings extends I18nField {
   playbackSpeed: string;
   subtitle: string;
   quality: string;
+  recommended: string;
+  hd: string;
   subtitleSettings: string;
   reset: string;
   off: string;
@@ -134,6 +136,8 @@ const defaultI18n: I18n = {
     yellow: 'Yellow',
     red: 'Red',
     lightBlue: 'Light Blue',
+    recommended: 'Recommended',
+    hd: 'HD',
   },
 };
 
