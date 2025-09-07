@@ -91,31 +91,35 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
           : newState.currentQuality,
       currentSubtitle:
         (() => {
-          const storedSubtitleLang = settings?.currentSubtitle;
-          let selectedSubtitle = newState.currentSubtitle;
-
           // If no subtitles are available yet, return null
           if (langSubtitles.length === 0) {
             return null;
           }
 
-          if (storedSubtitleLang) { // Only proceed if there's a stored subtitle preference
-            if (isInArray(storedSubtitleLang, langSubtitles)) {
+          const storedSubtitleLang = settings?.currentSubtitle;
+          // Default to the first available subtitle if no stored preference or match is found
+          let selectedSubtitle: string | null = newState.subtitles[0]?.lang || null;
+
+          if (storedSubtitleLang) {
+            if (isInArray(storedSubtitleLang, langSubtitles)) { // 1. Exact match
               selectedSubtitle = storedSubtitleLang as string;
             } else {
-              // If exact match not found, try to find a subtitle with the same language prefix
+              // 2. Try matching stored language prefix against available subtitles
               const storedLangPrefix = storedSubtitleLang.split(' v')[0];
-              const foundSubtitle = newState.subtitles.find(sub => sub.lang.startsWith(storedLangPrefix));
-              if (foundSubtitle) {
-                selectedSubtitle = foundSubtitle.lang;
+              const foundSubtitleByStoredPrefix = newState.subtitles.find(sub => sub.lang.startsWith(storedLangPrefix));
+              if (foundSubtitleByStoredPrefix) {
+                selectedSubtitle = foundSubtitleByStoredPrefix.lang;
               } else {
-                // If stored subtitle not found (exact or prefix), default to the first available subtitle
-                selectedSubtitle = newState.subtitles[0]?.lang || null;
+                // 3. Try matching available subtitle prefixes against stored language
+                const foundSubtitleByAvailablePrefix = newState.subtitles.find(sub => {
+                  const availableLangPrefix = sub.lang.split(' v')[0];
+                  return storedSubtitleLang.startsWith(availableLangPrefix);
+                });
+                if (foundSubtitleByAvailablePrefix) {
+                  selectedSubtitle = foundSubtitleByAvailablePrefix.lang;
+                }
               }
             }
-          } else {
-            // If no stored subtitle, default to the first available subtitle
-            selectedSubtitle = newState.subtitles[0]?.lang || null;
           }
           return selectedSubtitle;
         })(),
@@ -126,7 +130,7 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
   useEffect(() => {
     const state = getState();
     setState(state);
-  }, [getState]);
+  }, [getState, props.subtitles]);
   useEffect(() => {
     const {
       currentAudio,
