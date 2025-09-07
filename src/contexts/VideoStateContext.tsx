@@ -90,39 +90,10 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
           ? (settings.currentQuality as string) || null
           : newState.currentQuality,
       currentSubtitle:
-        (() => {
-          // If no subtitles are available yet, return null
-          if (langSubtitles.length === 0) {
-            return null;
-          }
-
-          const storedSubtitleLang = settings?.currentSubtitle;
-          // Default to the first available subtitle if no stored preference or match is found
-          let selectedSubtitle: string | null = newState.subtitles[0]?.lang || null;
-
-          if (storedSubtitleLang) {
-            if (isInArray(storedSubtitleLang, langSubtitles)) { // 1. Exact match
-              selectedSubtitle = storedSubtitleLang as string;
-            } else {
-              // 2. Try matching stored language prefix against available subtitles
-              const storedLangPrefix = storedSubtitleLang.split(' v')[0];
-              const foundSubtitleByStoredPrefix = newState.subtitles.find(sub => sub.lang.startsWith(storedLangPrefix));
-              if (foundSubtitleByStoredPrefix) {
-                selectedSubtitle = foundSubtitleByStoredPrefix.lang;
-              } else {
-                // 3. Try matching available subtitle prefixes against stored language
-                const foundSubtitleByAvailablePrefix = newState.subtitles.find(sub => {
-                  const availableLangPrefix = sub.lang.split(' v')[0];
-                  return storedSubtitleLang.startsWith(availableLangPrefix);
-                });
-                if (foundSubtitleByAvailablePrefix) {
-                  selectedSubtitle = foundSubtitleByAvailablePrefix.lang;
-                }
-              }
-            }
-          }
-          return selectedSubtitle;
-        })(),
+        isInArray(settings?.currentSubtitle, langSubtitles) ||
+        langSubtitles.length === 0
+          ? (settings.currentSubtitle as string) || null
+          : newState.currentSubtitle,
     };
     return { ...newState, ...filteredSettings };
   }, [defaultState, props?.defaultVideoState]);
@@ -130,7 +101,7 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
   useEffect(() => {
     const state = getState();
     setState(state);
-  }, [getState, props.subtitles]);
+  }, [getState]);
   useEffect(() => {
     const {
       currentAudio,
