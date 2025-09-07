@@ -94,7 +94,12 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
           const storedSubtitleLang = settings?.currentSubtitle;
           let selectedSubtitle = newState.currentSubtitle;
 
-          if (storedSubtitleLang) {
+          // If no subtitles are available yet, return null
+          if (langSubtitles.length === 0) {
+            return null;
+          }
+
+          if (storedSubtitleLang) { // Only proceed if there's a stored subtitle preference
             if (isInArray(storedSubtitleLang, langSubtitles)) {
               selectedSubtitle = storedSubtitleLang as string;
             } else {
@@ -103,8 +108,14 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
               const foundSubtitle = newState.subtitles.find(sub => sub.lang.startsWith(storedLangPrefix));
               if (foundSubtitle) {
                 selectedSubtitle = foundSubtitle.lang;
+              } else {
+                // If stored subtitle not found (exact or prefix), default to the first available subtitle
+                selectedSubtitle = newState.subtitles[0]?.lang || null;
               }
             }
+          } else {
+            // If no stored subtitle, default to the first available subtitle
+            selectedSubtitle = newState.subtitles[0]?.lang || null;
           }
           return selectedSubtitle;
         })(),
