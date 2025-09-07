@@ -90,10 +90,24 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
           ? (settings.currentQuality as string) || null
           : newState.currentQuality,
       currentSubtitle:
-        isInArray(settings?.currentSubtitle, langSubtitles) ||
-        langSubtitles.length === 0
-          ? (settings.currentSubtitle as string) || null
-          : newState.currentSubtitle,
+        (() => {
+          const storedSubtitleLang = settings?.currentSubtitle;
+          let selectedSubtitle = newState.currentSubtitle;
+
+          if (storedSubtitleLang) {
+            if (isInArray(storedSubtitleLang, langSubtitles)) {
+              selectedSubtitle = storedSubtitleLang as string;
+            } else {
+              // If exact match not found, try to find a subtitle with the same language prefix
+              const storedLangPrefix = storedSubtitleLang.split(' v')[0];
+              const foundSubtitle = newState.subtitles.find(sub => sub.lang.startsWith(storedLangPrefix));
+              if (foundSubtitle) {
+                selectedSubtitle = foundSubtitle.lang;
+              }
+            }
+          }
+          return selectedSubtitle;
+        })(),
     };
     return { ...newState, ...filteredSettings };
   }, [defaultState, props?.defaultVideoState]);

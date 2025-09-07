@@ -32,18 +32,43 @@ const App: React.FC = () => {
       ]}
         subtitles={[
           {
-            lang: "(PT v1) TWD1X1",
-            language: "(PT v1) TWD1X1",
+            lang: "(PT v2) TWD1X1",
+            language: "(PT v2) TWD1X1",
+            file: "https://sub.wyzie.ru/c/19e10c61/id/1952597846?format=srt&encoding=CP1252",
+          },
+                    {
+            lang: "(PT v0) asd",
+            language: "(PT v0) asd",
+            file: "https://sub.wyzie.ru/c/19e10c61/id/1952597846?format=srt&encoding=CP1252",
+          },
+                    {
+            lang: "(PT v2) 3441",
+            language: "(PT v2) 3441",
+            file: "https://sub.wyzie.ru/c/19e10c61/id/1952597846?format=srt&encoding=CP1252",
+          },
+                    {
+            lang: "(PT v2) sss",
+            language: "(PT v2) sss",
             file: "https://sub.wyzie.ru/c/19e10c61/id/1952597846?format=srt&encoding=CP1252",
           },
           {
-            lang: "(EN v1) TWD1X1",
-            language: "(EN v1) TWD1X1",
+            lang: "(EN v2) TWD1X1",
+            language: "(EN v2) TWD1X1",
             file: "https://sub.wyzie.ru/c/19b00c55/id/1961741348?format=srt&encoding=UTF-8",
           },
           {
-            lang: "(PT BR v1) ERROR",
-            language: "(PT BR v1) ERROR",
+            lang: "(PT BR v2) asdasd",
+            language: "(PT BR v2) asdasd",
+            file: "https://sub.wyzie.ru/c/19a50c51/id/1952608045?format=srt&encoding=CP1252",
+          },
+          {
+            lang: "(PT BR v2) ERROR",
+            language: "(PT BR v2) ERROR",
+            file: "https://sub.wyzie.ru/c/19a50c51/id/1952608045?format=srt&encoding=CP1252",
+          },
+          {
+            lang: "(PT BR v2) sssss",
+            language: "(PT BR v2) sssss",
             file: "https://sub.wyzie.ru/c/19a50c51/id/1952608045?format=srt&encoding=CP1252",
           }
         ]}
