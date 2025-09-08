@@ -44,6 +44,19 @@ export const VideoStateContext = React.createContext<VideoContextProps>({
 
 const LOCALSTORAGE_KEY = 'netplayer_video_settings';
 
+function getLangCode(lang: string | null | undefined): string | null {
+  if (!lang) return null;
+  const match = lang.match(/^\(([^)]+)\)/);
+  if (!match) return lang;
+  const inside = match[1].trim();
+  const parts = inside.split(/\s+/);
+  if (parts.length > 1 && parts[parts.length - 1].match(/^v\d+$/i)) {
+    // If the last part is a version like "v1", "v2", etc., exclude it
+    return parts.slice(0, -1).join(' ');
+  }
+  return inside;
+}
+
 export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
   children,
 }) => {
@@ -89,13 +102,31 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
         langQualities.length === 0
           ? (settings.currentQuality as string) || null
           : newState.currentQuality,
-      currentSubtitle:
-        isInArray(settings?.currentSubtitle, langSubtitles) ||
-        langSubtitles.length === 0
-          ? (settings.currentSubtitle as string) || null
-          : newState.currentSubtitle,
     };
-    return { ...newState, ...filteredSettings };
+
+    let currentSubtitle: string | null;
+    if (isInArray(settings?.currentSubtitle, langSubtitles) || langSubtitles.length === 0) {
+      currentSubtitle = (settings.currentSubtitle as string) || null;
+    } else {
+      // Smart matching logic
+      const savedSubtitle = settings?.currentSubtitle;
+      const savedBase = getLangCode(savedSubtitle);
+      if (savedBase) {
+        // Find the first subtitle with matching base language code
+        const matchingSub = newState.subtitles.find(
+          (s) => getLangCode(s.lang) === savedBase
+        );
+        if (matchingSub) {
+          currentSubtitle = matchingSub.lang;
+        } else {
+          currentSubtitle = newState.currentSubtitle;
+        }
+      } else {
+        currentSubtitle = newState.currentSubtitle;
+      }
+    }
+
+    return { ...newState, ...filteredSettings, currentSubtitle };
   }, [defaultState, props?.defaultVideoState]);
   const [state, setState] = React.useState<VideoState>(getState);
   useEffect(() => {
@@ -109,15 +140,17 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
       currentSubtitle,
       isSubtitleDisabled,
     } = state;
-    localStorage.setItem(
-      LOCALSTORAGE_KEY,
-      JSON.stringify({
-        currentAudio,
-        currentQuality,
-        currentSubtitle,
-        isSubtitleDisabled,
-      })
-    );
+    if (!currentSubtitle?.includes("(Sem Fonte)")) {
+      localStorage.setItem(
+        LOCALSTORAGE_KEY,
+        JSON.stringify({
+          currentAudio,
+          currentQuality,
+          currentSubtitle,
+          isSubtitleDisabled,
+        })
+      );
+    }
   }, [state]);
   const updateState: UpdateStateAction = (stateSelector) => {
     setState((prev) => ({ ...prev, ...stateSelector(prev) }));
