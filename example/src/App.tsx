@@ -20,12 +20,12 @@ const App: React.FC = () => {
         {
           lang: "(PT v2) 3441",
           language: "(PT v2) 3441",
-          file: "https://sub.wyzie.ru/c/19e10c61/id/1952597846?format=srt&encoding=CP1252",
+          file: "https://cca.megafiles.store/03/57/0357b2f774963019a8ea1e7689acb7e5/por-17.vtt",
         },
         {
           lang: "(PT v2) sss",
           language: "(PT v2) sss",
-          file: "https://sub.wyzie.ru/c/19e10c61/id/1952597846?format=srt&encoding=CP1252",
+          file: "https://dl.opensubtitles.org/en/download/src-api/vrf-19d50c5c/file/1961588454.ass",
         },
         {
           lang: "(EN v2) TWD1X1",
@@ -45,7 +45,7 @@ const App: React.FC = () => {
         {
           lang: "(PT BR v2) sssss",
           language: "(PT BR v2) sssss",
-          file: "https://sub.wyzie.ru/c/19a50c51/id/1952608045?format=srt&encoding=CP1252",
+          file: "https://dl.opensubtitles.org/en/download/subencoding-utf8/src-api/vrf-19d80c58/file/1956832841.srt",
         },
         {
           lang: "Portuguese (Sem Fonte)",

@@ -36,6 +36,8 @@ const SubtitleContent = ({ scrollToSubtitle }: { scrollToSubtitle: () => void })
     const checkSubtitles = () => {
       if (state.subtitles && state.subtitles.length > 0) {
         setLoading(false);
+      } else {
+        setLoading(true);
       }
     };
 
