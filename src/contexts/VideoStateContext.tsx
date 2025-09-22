@@ -139,8 +139,43 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
       currentQuality,
       currentSubtitle,
       isSubtitleDisabled,
+      subtitles,
     } = state;
-    if (!currentSubtitle?.includes("(Sem Fonte)")) {
+    
+    // Track if this is a fallback selection
+    const isFallbackSelection = (() => {
+      // Get the previous settings from localStorage
+      const rawSettings = localStorage.getItem(LOCALSTORAGE_KEY);
+      if (!rawSettings) return false;
+      
+      const settings = JSON.parse(rawSettings);
+      const savedSubtitle = settings?.currentSubtitle;
+      
+      // If there's no saved subtitle, this isn't a fallback
+      if (!savedSubtitle) return false;
+      
+      // If the current subtitle is already in localStorage, it's not a fallback
+      if (savedSubtitle === currentSubtitle) return false;
+      
+      // If the current subtitle is the first one AND we're in the smart matching logic path
+      // where no matching subtitle was found, then it's a fallback
+      if (currentSubtitle === subtitles[0]?.lang) {
+        const savedBase = getLangCode(savedSubtitle);
+        if (savedBase) {
+          // Check if there's any subtitle with matching base language
+          const matchingSub = subtitles.find(
+            (s) => getLangCode(s.lang) === savedBase
+          );
+          // If no matching subtitle was found, this is a fallback selection
+          return !matchingSub;
+        }
+      }
+      
+      return false;
+    })();
+    
+    // Don't save if it's "(Sem Fonte)" or a fallback selection
+    if (!currentSubtitle?.includes("(Sem Fonte)") && !isFallbackSelection) {
       localStorage.setItem(
         LOCALSTORAGE_KEY,
         JSON.stringify({
