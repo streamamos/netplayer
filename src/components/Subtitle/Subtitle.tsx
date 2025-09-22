@@ -228,6 +228,7 @@ const Subtitle = () => {
           fontSize: fontSize + 'px',
           lineHeight: lineHeight + 'px',
           backgroundColor: `rgba(0, 0, 0, ${subtitleSettings.backgroundOpacity})`,
+          backdropFilter: subtitleSettings.backgroundBlur ? 'blur(5px)' : 'none',
           color: colorToRgba(subtitleSettings.textColor, subtitleSettings.fontOpacity),
           textShadow: textStyles[subtitleSettings.textStyle],
         }}

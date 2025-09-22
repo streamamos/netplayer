@@ -8,6 +8,7 @@ import SettingsIcon from '../../../icons/SettingsIcon';
 import NestedMenu from '../../../NestedMenu';
 import { SubMenuProps } from '../../../NestedMenu/NestedMenu';
 import SubtitleBackgroundOpacity from './SubtitleBackgroundOpacity';
+import SubtitleBackgroundBlur from './SubtitleBackgroundBlur';
 import SubtitleFontOpacity from './SubtitleFontOpacity';
 import SubtitleFontSize from './SubtitleFontSize';
 import SubtitleSyncSub from './SubtitleSyncSub';
@@ -31,6 +32,7 @@ const SubtitleSettings: React.FC<Partial<SubMenuProps>> = (props) => {
     >
       <SubtitleFontSize />
       <SubtitleBackgroundOpacity />
+      <SubtitleBackgroundBlur />
       <SubtitleTextStyle />
       <SubtitleFontOpacity />
       <SubtitleSyncSub />

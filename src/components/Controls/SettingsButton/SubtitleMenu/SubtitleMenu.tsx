@@ -5,30 +5,23 @@ import SubtitleIcon from '../../../icons/SubtitleIcon';
 import NestedMenu from '../../../NestedMenu';
 import SubtitleSettings from './SubtitleSettings';
 
+import BrFlag from '../../../icons/flags/BrFlag';
+import PtFlag from '../../../icons/flags/PtFlag';
+import EnFlag from '../../../icons/flags/EnFlag';
+
+
 const getLangSVG = (lang: string) => {
   if (lang.includes('BR v')) {
     return (
-      <img
-        src="https://flagicons.lipis.dev/flags/4x3/br.svg"
-        alt="PT-BR"
-        style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }}
-      />
+      <BrFlag style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }}/>
     );
   } else if (lang.includes('PT v')) {
     return (
-      <img
-        src="https://flagicons.lipis.dev/flags/4x3/pt.svg"
-        alt="PT"
-        style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }}
-      />
+      <PtFlag style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }}/>
     );
   } else if (lang.includes('EN v')) {
     return (
-      <img
-        src="https://flagicons.lipis.dev/flags/4x3/gb.svg"
-        alt="EN"
-        style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }}
-      />
+      <EnFlag style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }}/>
     );
   } else {
     return null;

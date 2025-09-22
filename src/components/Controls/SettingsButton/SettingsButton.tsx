@@ -20,9 +20,14 @@ import OpacityIcon from '../../icons/OpacityIcon';
 import FontStyleIcon from '../../icons/FontStyleIcon';
 import FontOpacityIcon from '../../icons/FontOpacityIcon';
 import ColorIcon from '../../icons/ColorIcon';
+import BlurIcon from '../../icons/BlurIcon';
 import CheckIcon from '../../icons/CheckIcon';
 import ModalSyncSub from './SubtitleMenu/ModalSyncSub';
 import SubtitleUpload from './SubtitleMenu/SubtitleUpload';
+
+import BrFlag from '../../icons/flags/BrFlag';
+import PtFlag from '../../icons/flags/PtFlag';
+import EnFlag from '../../icons/flags/EnFlag';
 
 import { colorToRgba } from '../../../utils/color';
 
@@ -70,27 +75,15 @@ const SubtitleContent = ({ scrollToSubtitle }: { scrollToSubtitle: () => void })
   const getLangSVG = (lang: string) => {
     if (lang.includes('BR v')) {
       return (
-        <img
-          src="https://flagicons.lipis.dev/flags/4x3/br.svg"
-          alt="PT-BR"
-          style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }}
-        />
+        <BrFlag style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }} />
       );
     } else if (lang.includes('PT v')) {
       return (
-        <img
-          src="https://flagicons.lipis.dev/flags/4x3/pt.svg"
-          alt="PT"
-          style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }}
-        />
+        <PtFlag style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }} />
       );
     } else if (lang.includes('EN v')) {
       return (
-        <img
-          src="https://flagicons.lipis.dev/flags/4x3/gb.svg"
-          alt="EN"
-          style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }}
-        />
+        <EnFlag style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }} />
       );
     } else {
       return null;
@@ -285,6 +278,30 @@ const SubtitleSettingsContent = () => {
               <span>{`${opacity}%`}</span>
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className={styles.settingsSection}>
+        <div className={styles.sectionTitle}><BlurIcon />{i18n.settings.subtitleBackgroundBlur}</div>
+        <div className={`${styles.optionsGrid} ${styles.optionsGridBlur}`}>
+          <div
+            className={`${styles.menuItem} ${state.backgroundBlur ? styles.activeMenuItem : ''}`}
+            onClick={() => setState(() => ({ backgroundBlur: true }))}
+          >
+            {state.backgroundBlur && (
+              <span className={styles.menuItemCheckIcon}></span>
+            )}
+            <span>{i18n.settings.onBlur}</span>
+          </div>
+          <div
+            className={`${styles.menuItem} ${!state.backgroundBlur ? styles.activeMenuItem : ''}`}
+            onClick={() => setState(() => ({ backgroundBlur: false }))}
+          >
+            {!state.backgroundBlur && (
+              <span className={styles.menuItemCheckIcon}></span>
+            )}
+            <span>{i18n.settings.offBlur}</span>
+          </div>
         </div>
       </div>
 

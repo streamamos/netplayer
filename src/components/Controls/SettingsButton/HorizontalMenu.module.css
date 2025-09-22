@@ -140,6 +140,10 @@
   gap: 0.5rem;
 }
 
+.optionsGridBlur {
+  grid-template-columns: repeat(auto-fill, minmax(48%, 1fr));
+}
+
 .optionsGrid .menuItem {
   justify-content: center;
   text-align: center;

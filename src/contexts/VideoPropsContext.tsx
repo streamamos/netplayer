@@ -40,6 +40,7 @@ interface I18nSettings extends I18nField {
   subtitleFontOpacity: string;
   subtitleFontSize: string;
   subtitleTextColor: string;
+  subtitleBackgroundBlur: string;
   white: string;
   yellow: string;
   red: string;
@@ -117,6 +118,8 @@ const defaultI18n: I18n = {
     reset: 'Reset',
     none: 'None',
     off: 'Off',
+    onBlur: 'On',
+    offBlur: 'Off',
     subtitleBackgroundOpacity: 'Background Opacity',
     subtitleFontOpacity: 'Font Opacity',
     subtitleFontSize: 'Font Size',
@@ -132,6 +135,7 @@ const defaultI18n: I18n = {
     mySubtitle: 'My subtitle',
     loading: '',
     subtitleTextColor: 'Text Color',
+    subtitleBackgroundBlur: 'Background Blur',
     white: 'White',
     yellow: 'Yellow',
     red: 'Red',

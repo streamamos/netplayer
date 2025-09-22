@@ -13,6 +13,7 @@ interface SubtitleSettings {
   textStyle: 'none' | 'outline' | 'raised' | 'depressed' | 'dropShadow';
   fontOpacity: number;
   textColor: 'white' | 'yellow' | 'red' | 'lightblue';
+  backgroundBlur: boolean;
 }
 
 type StateSelector = (
@@ -38,6 +39,7 @@ export const defaultSubtitleSettings: SubtitleSettings = {
   fontOpacity: 1,
   textStyle: 'none',
   textColor: 'white',
+  backgroundBlur: false,
 };
 
 export const SubtitleSettingsContext =
