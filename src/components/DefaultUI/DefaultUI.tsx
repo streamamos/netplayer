@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { isMobile } from 'react-device-detect';
 import { useInteract } from '../../contexts/VideoInteractingContext';
+import { useVideo } from '../../contexts/VideoContext';
 import { Components, NetPlayerProps } from '../../contexts/VideoPropsContext';
 import useDoubleTap from '../../hooks/useDoubleTap';
 import useGlobalHotKeys from '../../hooks/useGlobalHotKeys';
@@ -116,12 +117,19 @@ const DefaultUI = React.forwardRef<HTMLVideoElement, NetPlayerProps>(
       },
       [ref]
     );
+    const { isInteracting } = useInteract();
+    const { videoState } = useVideo();
+    
+    const shouldHideCursor = !videoState.seeking && 
+                            !isInteracting && 
+                            !videoState.buffering;
+
     return (
       <div
         onClick={!isMobile ? resetInteractingCycle : noop}
         onMouseMove={!isMobile ? resetInteractingCycle : noop}
         onTouchStart={isMobile ? onTap : noop}
-        className={classNames(PLAYER_CONTAINER_CLASS, styles.container)}
+        className={classNames(PLAYER_CONTAINER_CLASS, styles.container, shouldHideCursor && styles.hideCursor)}
       >
         <uiComponents.MobileBackwardIndicator ref={backIndicatorRef} />
         <uiComponents.MobileForwardIndicator ref={forwardIndicatorRef} />

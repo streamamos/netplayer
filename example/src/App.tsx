@@ -60,6 +60,7 @@ const App: React.FC = () => {
   }, [])
 
   return (
+    <div style={{ padding: '100px', backgroundColor: 'black', width: '100%', height: '100%' }}>
     <NetPlayer
       sources={[
         {
@@ -92,6 +93,7 @@ const App: React.FC = () => {
       thumbnail="https://preview.zorores.com/8b/8bc17ab9537166f2abb7e0bef2b57e23/thumbnails/sprite.vtt"
       autoPlay
     />
+    </div>
   )
 }
 

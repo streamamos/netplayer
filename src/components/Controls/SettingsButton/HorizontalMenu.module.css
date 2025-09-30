@@ -186,6 +186,65 @@
   animation: shadowPulse 1.5s linear infinite;
 }
 
+/* Existing styles assumed to be here */
+.sliderInputContainer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sliderInput {
+  -webkit-appearance: none; 
+  height: 12px; 
+  background: #292929; 
+  border-radius: 20px; 
+  background-repeat: no-repeat; 
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+.sliderInput::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 12px;
+  background: #292929;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.sliderInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #ffa31a;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: -100vw 0 0 100vw #ffa31a;
+  position: relative;
+  top: -4px;
+}
+
+.sliderInput::-moz-range-track {
+  width: 100%;
+  height: 12px;
+  background: #292929; /* Grey background for the track */
+  border-radius: 20px;
+}
+
+.sliderInput::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #ffa31a; /* Orange thumb */
+  border: none;
+  border-radius: 50%; /* Explicitly circular */
+  cursor: pointer;
+}
+
+.sliderInput::-moz-range-progress {
+  background: #ffa31a; /* Orange fill for the progress in Firefox */
+  height: 12px;
+  border-radius: 20px;
+}
+
 @keyframes shadowPulse {
   33% {
     background: #292929;

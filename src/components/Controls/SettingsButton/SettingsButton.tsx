@@ -175,7 +175,6 @@ const SubtitleSettingsContent = () => {
   const { i18n } = useVideoProps();
   const { videoEl } = useVideo();
 
-  const fontSizes = [0.5, 1, 1.5, 2];
   const opacities = [0, 50, 75, 100];
   const speeds = [0.25, 1, 1.5, 2];
   const currentSpeed = videoEl?.playbackRate || 1;
@@ -198,6 +197,11 @@ const SubtitleSettingsContent = () => {
     { key: 'raised', label: 'Elevado', style: { textShadow: 'black 0px 0px 5px, black 0px 1px 5px, black 0px 2px 5px' } },
     { key: 'dropShadow', label: 'Sombra', style: { textShadow: 'black 0px 2px 1px' } },
   ];
+
+  const handleFontSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(event.target.value) / 100;
+    setState(() => ({ fontSize: value }));
+  };
 
   return (
     <div className={styles.directMenuContent}>
@@ -229,19 +233,17 @@ const SubtitleSettingsContent = () => {
 
       <div className={styles.settingsSection}>
         <div className={styles.sectionTitle}><FontSizeIcon />{i18n.settings.subtitleFontSize}</div>
-        <div className={styles.optionsGrid}>
-          {fontSizes.map((size) => (
-            <div
-              key={size}
-              className={`${styles.menuItem} ${state.fontSize === size ? styles.activeMenuItem : ''}`}
-              onClick={() => setState(() => ({ fontSize: size }))}
-            >
-              {state.fontSize === size && (
-                <span className={styles.menuItemCheckIcon}></span>
-              )}
-              <span>{`${size * 100}%`}</span>
-            </div>
-          ))}
+          <div className={styles.sliderInputContainer}>
+            <input
+              type="range"
+              min="0"
+              max="200"
+              step="5"
+              value={state.fontSize * 100}
+              onChange={handleFontSizeChange}
+              className={styles.sliderInput}
+            />
+            <span>{`${Math.round(state.fontSize * 100)}%`}</span>
         </div>
       </div>
 
