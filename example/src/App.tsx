@@ -10,7 +10,7 @@ const App: React.FC = () => {
         {
           lang: "(PT v2) TWD1X1",
           language: "(PT v2) TWD1X1",
-          file: "https://sub.wyzie.ru/c/19e10c61/id/1952597846?format=srt&encoding=CP1252",
+          file: "https://dl.opensubtitles.org/en/download/src-api/vrf-19cf0c5b/file/1961764907.srt",
         },
         {
           lang: "(PT v0) asd",

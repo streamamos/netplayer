@@ -23,7 +23,10 @@ const re_ass = new RegExp(
   'i'
 );
 const re_newline = /\\n/ig;
-const re_an8 = /{\\an8}/g; // Regex to detect {\an8}
+const re_an8 = /{\\an\d}/g; // Regex to detect {\an8}
+
+const re_font = /<font[^>]*>/g;
+const re_font_close = /<\/font>/g;
 
 // Custom ASS to SRT conversion function
 const convertAssToSrt = (assText: string): string => {
@@ -185,7 +188,10 @@ const Subtitle = () => {
             entry.to >= currentTime + delayTime * -1
         );
         if (currentEntry) {
-          const cleanedText = currentEntry.text.replace(re_an8, '');
+          const cleanedText = currentEntry.text
+              .replace(re_an8, '')
+              .replace(re_font, '')
+              .replace(re_font_close, '');
           setCurrentText(cleanedText);
           setHasAn8(re_an8.test(currentEntry.text));
         } else {
