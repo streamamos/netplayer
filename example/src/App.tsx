@@ -37,11 +37,11 @@ const App: React.FC = () => {
           language: "(PT BR v2) asdasd",
           file: "https://sub.wyzie.ru/c/19a50c51/id/1952608045?format=srt&encoding=CP1252",
         },
-        // {
-        //   lang: "(PT BR v2) ERROR",
-        //   language: "(PT BR v2) ERROR",
-        //   file: "https://sub.wyzie.ru/c/19a50c51/id/1952608045?format=srt&encoding=CP1252",
-        // },
+        {
+          lang: "(PT BR v2) ERROR",
+          language: "(PT BR v2) ERROR",
+          file: "https://dl.opensubtitles.org/en/download/subencoding-utf8/src-api/vrf-19d50c5e/file/1961827955.ass",
+        },
         {
           lang: "(PT BR v2) sssss",
           language: "(PT BR v2) sssss",

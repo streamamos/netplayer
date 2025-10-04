@@ -1,3 +1,4 @@
+import SrtParser2 from 'srt-parser-2';
 import { parse } from '@plussub/srt-vtt-parser';
 import React, { useEffect, useMemo, useState } from 'react';
 import { isDesktop } from 'react-device-detect';
@@ -10,6 +11,24 @@ import { colorToRgba } from '../../utils/color';
 import useTextScaling from '../../hooks/useTextScaling';
 import { classNames, isValidUrl } from '../../utils';
 import styles from './Subtitle.module.css';
+
+interface SrtParser2Entry {
+  id: string;
+  startTime: string;
+  startSeconds: number;
+  endTime: string;
+  endSeconds: number;
+  text: string;
+}
+
+interface PlusSubEntry {
+  id: string;
+  from: number;
+  to: number;
+  text: string;
+}
+
+type SubtitleEntry = SrtParser2Entry | PlusSubEntry;
 
 // Regular expressions for ASS parsing
 const re_ass = new RegExp(
@@ -179,14 +198,40 @@ const Subtitle = () => {
     let handleSubtitle: () => void = () => {};
     try {
       if (!subtitleText) return;
-      const { entries = [] } = parse(subtitleText);
+      
+      // Try srt-parser-2 first
+      const parser = new SrtParser2();
+      let entries: SubtitleEntry[] = parser.fromSrt(subtitleText);
+      let usingSrtParser2 = true;
+      
+      // If entries is empty, fallback to @plussub/srt-vtt-parser
+      if (!entries || entries.length === 0) {
+        const parseResult = parse(subtitleText);
+        entries = parseResult.entries || [];
+        usingSrtParser2 = false;
+      }
+      
+      
       handleSubtitle = () => {
-        const currentTime = videoEl.currentTime * 1000;
-        const currentEntry = entries.find(
-          (entry) =>
-            entry.from <= currentTime + delayTime * -1 &&
-            entry.to >= currentTime + delayTime * -1
-        );
+        const currentTime = videoEl.currentTime;
+        let currentEntry: SubtitleEntry | undefined;
+        
+        if (usingSrtParser2) {
+          // Using SrtParser2 format (seconds)
+          currentEntry = entries.find(
+            (entry) =>
+              (entry as SrtParser2Entry).startSeconds <= currentTime + delayTime * -0.001 &&
+              (entry as SrtParser2Entry).endSeconds >= currentTime + delayTime * -0.001
+          );
+        } else {
+          // Using @plussub/srt-vtt-parser format (milliseconds)
+          currentEntry = entries.find(
+            (entry) =>
+              (entry as PlusSubEntry).from <= currentTime * 1000 + delayTime * -1 &&
+              (entry as PlusSubEntry).to >= currentTime * 1000 + delayTime * -1
+          );
+        }
+        
         if (currentEntry) {
           const cleanedText = currentEntry.text
               .replace(re_an8, '')

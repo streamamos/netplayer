@@ -28,6 +28,7 @@ import SubtitleUpload from './SubtitleMenu/SubtitleUpload';
 import BrFlag from '../../icons/flags/BrFlag';
 import PtFlag from '../../icons/flags/PtFlag';
 import EnFlag from '../../icons/flags/EnFlag';
+import NoFlag from '../../icons/flags/NoFlag';
 
 import { colorToRgba } from '../../../utils/color';
 
@@ -84,6 +85,10 @@ const SubtitleContent = ({ scrollToSubtitle }: { scrollToSubtitle: () => void })
     } else if (lang.includes('EN v')) {
       return (
         <EnFlag style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }} />
+      );
+    } else if (lang.includes('Sem Fonte')) {
+      return (
+        <NoFlag style={{ width: 20, marginRight: 4, verticalAlign: 'middle' }} />
       );
     } else {
       return null;
