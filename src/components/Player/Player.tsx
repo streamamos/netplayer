@@ -132,19 +132,22 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
                 }));
               });
             });
-            _hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, (_, event) => {
-              const modifiedSubtitles = event.subtitleTracks.map(
-                (track, index) => ({
-                  file: track.details?.fragments?.[0].url || track.url,
-                  lang: track.lang || index.toString(),
-                  language: track.name,
-                })
-              );
-              setState(() => ({
-                subtitles: modifiedSubtitles,
-                currentSubtitle: modifiedSubtitles[0]?.lang,
-              }));
-            });
+
+            //----REMOVED THIS SECTIONS SO M3U8 EMBEDDED SUBTITLES WONT OVERRIDE EXTERNAL SUBTITLES----
+
+            // _hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, (_, event) => {
+            //   const modifiedSubtitles = event.subtitleTracks.map(
+            //     (track, index) => ({
+            //       file: track.details?.fragments?.[0].url || track.url,
+            //       lang: track.lang || index.toString(),
+            //       language: track.name,
+            //     })
+            //   );
+            //   setState(() => ({
+            //     subtitles: modifiedSubtitles,
+            //     currentSubtitle: modifiedSubtitles[0]?.lang,
+            //   }));
+            // });
             _hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, (_, event) => {
               const modifiedAudios = event.audioTracks.map((track, index) => ({
                 lang: track.lang || index.toString(),

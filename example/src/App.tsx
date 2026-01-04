@@ -63,30 +63,34 @@ const App: React.FC = () => {
     <div style={{ padding: '100px', backgroundColor: 'black', width: '100%', height: '100%' }}>
     <NetPlayer
       sources={[
+        // {
+        //   file: `https://small-cake-fdee.piracya.workers.dev/m3u8-proxy?url=https%3A%2F%2Fvixsrc.to%2Fplaylist%2F173365%3Fb%3D1%26token%3D7a5ed11898460bbdaba04d5ccb3b4926%26expires%3D1772674011%26h%3D1%26lang%3Den&headers=%7B%22Referer%22%3A%22https%3A%2F%2Fvixsrc.to%2Ftv%2F1399%2F1%2F1%22%2C%22User-Agent%22%3A%22Mozilla%2F5.0%20(Macintosh%3B%20Intel%20Mac%20OS%20X%2010_15_7)%20AppleWebKit%2F537.36%22%7D`,
+        //   label: 'auto'
+        // },
         {
-          file: `https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8`,
+          file: `https://cdn.bitmovin.com/content/assets/sintel/hls/playlist.m3u8`,
           label: 'auto'
         },
-        {
-          file: `https://test-streams.mux.dev/x36xhzz/url_8/193039199_mp4_h264_aac_fhd_7.m3u8`,
-          label: '1080'
-        },
-        {
-          file: `https://test-streams.mux.dev/x36xhzz/url_0/193039199_mp4_h264_aac_hd_7.m3u8`,
-          label: '720'
-        },
-        {
-          file: `https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8`,
-          label: '480'
-        },
-        {
-          file: `https://test-streams.mux.dev/x36xhzz/url_4/193039199_mp4_h264_aac_7.m3u8`,
-          label: '288'
-        },
-        {
-          file: `https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8`,
-          label: '184'
-        },
+        // {
+        //   file: `https://test-streams.mux.dev/x36xhzz/url_8/193039199_mp4_h264_aac_fhd_7.m3u8`,
+        //   label: '1080'
+        // },
+        // {
+        //   file: `https://test-streams.mux.dev/x36xhzz/url_0/193039199_mp4_h264_aac_hd_7.m3u8`,
+        //   label: '720'
+        // },
+        // {
+        //   file: `https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8`,
+        //   label: '480'
+        // },
+        // {
+        //   file: `https://test-streams.mux.dev/x36xhzz/url_4/193039199_mp4_h264_aac_7.m3u8`,
+        //   label: '288'
+        // },
+        // {
+        //   file: `https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8`,
+        //   label: '184'
+        // },
       ]}
       subtitles={subtitles}
       className="object-contain w-full h-full"
