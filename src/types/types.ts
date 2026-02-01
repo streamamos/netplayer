@@ -34,3 +34,23 @@ export type HotKey = {
   hotKey: string | string[];
   preventDefault?: boolean;
 };
+
+export interface SegmentDetail {
+  start_ms: number | null;
+  end_ms: number | null;
+  confidence: number | null;
+  submission_count: number;
+}
+
+export interface skipsegments {
+  intro?: SegmentDetail;
+  recap?: SegmentDetail;
+  credits?: SegmentDetail;
+  [key: string]: SegmentDetail | undefined;
+}
+
+export interface CalculatedSegment {
+  type: 'intro' | 'recap' | 'credits';
+  startPercent: number;
+  widthPercent: number;
+}

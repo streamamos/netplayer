@@ -61,3 +61,23 @@
   background-color: 'black';
   border: 2px solid white;
 }
+
+.skipSegment {
+  position: absolute;
+  height: 100%; /* Same height as innerContainer */
+  top: 0;
+  z-index: 0; /* Above background bar, below play/hover bars */
+  opacity: 0.5;
+}
+
+.intro {
+  background-color: #ff0000; /* Red */
+}
+
+.recap {
+  background-color: #00ff00; /* Green */
+}
+
+.credits {
+  background-color: #0000ff; /* Blue */
+}

@@ -93,6 +93,26 @@ const App: React.FC = () => {
         // },
       ]}
       subtitles={subtitles}
+      skipsegments={{
+        intro: {
+          start_ms: null,
+          end_ms: 10000,
+          "confidence": 0.25,
+          "submission_count": 1
+        },
+        recap: {
+          start_ms: null,
+          end_ms: null,
+          "confidence": 0.25,
+          "submission_count": 1
+        },
+        credits: {
+          start_ms: 100000,
+          end_ms: null,
+          "confidence": 0.25,
+          "submission_count": 1
+        },
+      }}
       className="object-contain w-full h-full"
       thumbnail="https://preview.zorores.com/8b/8bc17ab9537166f2abb7e0bef2b57e23/thumbnails/sprite.vtt"
       autoPlay
