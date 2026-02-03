@@ -143,6 +143,8 @@ const defaultI18n: I18n = {
     lightBlue: 'Light Blue',
     recommended: 'Recommended',
     hd: 'HD',
+    showTranscript: 'Show Transcript',
+    hideTranscript: 'Hide Transcript',
   },
 };
 

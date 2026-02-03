@@ -28,15 +28,16 @@ const ModalSyncSub = () => {
   const [subtitleText, setSubtitleText] = useState<string | null>(null);
   const [currentSubIndex, setCurrentSubIndex] = useState<number>(-1);
   const [isLoadingSubtitles, setIsLoadingSubtitles] = useState(false);
+  const [showTranscript, setShowTranscript] = useState(false);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const activeSubRef = useRef<HTMLDivElement>(null);
 
   // Get current subtitle file
   const subtitle = state.subtitles?.find((sub) => sub.lang === state.currentSubtitle);
 
-  // Load subtitle file
+  // Load subtitle file only when transcript is shown
   useEffect(() => {
-    if (!subtitle?.file) {
+    if (!subtitle?.file || !showTranscript) {
       setSubtitleText(null);
       return;
     }
@@ -45,6 +46,7 @@ const ModalSyncSub = () => {
       setIsLoadingSubtitles(true);
       try {
         const text = await requestSubtitle(subtitle.file);
+        console.log("loaded subtitle text:");
         setSubtitleText(text);
       } catch (error) {
         console.error('Error loading subtitles:', error);
@@ -54,7 +56,7 @@ const ModalSyncSub = () => {
     };
 
     loadSubtitles();
-  }, [subtitle]);
+  }, [subtitle, showTranscript]);
 
   // Parse subtitles using the shared hook
   const { subtitleEntries, usingSrtParser2 } = useSubtitleParser(subtitleText);
@@ -213,10 +215,16 @@ const ModalSyncSub = () => {
           <button className={styles.modalButtonApply} onClick={handleReset}>
             {i18n.settings.apply}
           </button>
+          <button 
+            className={styles.modalButtonTranscript} 
+            onClick={() => setShowTranscript(!showTranscript)}
+          >
+            {showTranscript ? i18n.settings.hideTranscript : i18n.settings.showTranscript}
+          </button>
         </div>
 
         {/* Subtitle Transcript Section */}
-        {!isLoadingSubtitles && subtitleEntries.length > 0 && (
+        {showTranscript && !isLoadingSubtitles && subtitleEntries.length > 0 && (
           <div className={styles.transcriptContainer} ref={transcriptRef}>
             <div className={styles.transcriptList}>
               {subtitleEntries.map((entry, index) => {
