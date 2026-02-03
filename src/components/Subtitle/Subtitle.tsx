@@ -12,7 +12,10 @@ import useTextScaling from '../../hooks/useTextScaling';
 import { classNames, isValidUrl } from '../../utils';
 import styles from './Subtitle.module.css';
 
-interface SrtParser2Entry {
+// ============================================================================
+// EXPORTED TYPES AND INTERFACES
+// ============================================================================
+export interface SrtParser2Entry {
   id: string;
   startTime: string;
   startSeconds: number;
@@ -21,17 +24,19 @@ interface SrtParser2Entry {
   text: string;
 }
 
-interface PlusSubEntry {
+export interface PlusSubEntry {
   id: string;
   from: number;
   to: number;
   text: string;
 }
 
-type SubtitleEntry = SrtParser2Entry | PlusSubEntry;
+export type SubtitleEntry = SrtParser2Entry | PlusSubEntry;
 
-// Regular expressions for ASS parsing
-const re_ass = new RegExp(
+// ============================================================================
+// EXPORTED REGULAR EXPRESSIONS
+// ============================================================================
+export const re_ass = new RegExp(
   'Dialogue:\\s\\d,' +
   '(\\d+:\\d\\d:\\d\\d\\.\\d\\d),' +
   '(\\d+:\\d\\d:\\d\\d\\.\\d\\d),' +
@@ -41,14 +46,37 @@ const re_ass = new RegExp(
   '(.*)$',
   'i'
 );
-const re_newline = /\\n/ig;
-const re_an8 = /{\\an\d}/g; // Regex to detect {\an8}
+export const re_newline = /\\n/ig;
+export const re_an8 = /{\\an\d}/g;
+export const re_font = /<font[^>]*>/g;
+export const re_font_close = /<\/font>/g;
+const M3U8_SUBTITLE_REGEX = /.*\.(vtt|srt)/g;
 
-const re_font = /<font[^>]*>/g;
-const re_font_close = /<\/font>/g;
+// ============================================================================
+// EXPORTED UTILITY FUNCTIONS
+// ============================================================================
+export const assTime2Int = (assTime: string): number => {
+  return parseInt(assTime.replace(/[^0-9]/g, ''));
+};
 
-// Custom ASS to SRT conversion function
-const convertAssToSrt = (assText: string): string => {
+export const assTime2SrtTime = (assTime: string): string => {
+  let h = '00',
+    m = '00',
+    s = '00',
+    ms = '000';
+  const t = assTime.split(':');
+  if (t.length > 0) h = t[0].length === 1 ? '0' + t[0] : t[0];
+  if (t.length > 1) m = t[1].length === 1 ? '0' + t[1] : t[1];
+  if (t.length > 2) {
+    const t2 = t[2].split('.');
+    if (t2.length > 0) s = t2[0].length === 1 ? '0' + t2[0] : t2[0];
+    if (t2.length > 1)
+      ms = t2[1].length === 2 ? '0' + t2[1] : t2[1].length === 1 ? '00' + t2[1] : t2[1];
+  }
+  return `${h}:${m}:${s},${ms}`;
+};
+
+export const convertAssToSrt = (assText: string): string => {
   const srts: { start: string; end: string; text: string; hasAn8: boolean }[] = [];
   
   String(assText)
@@ -77,7 +105,6 @@ const convertAssToSrt = (assText: string): string => {
     .map((srt) => {
       const start = assTime2SrtTime(srt.start);
       const end = assTime2SrtTime(srt.end);
-      // Store hasAn8 as a data attribute or similar if needed
       return `${i++}\n${start} --> ${end}\n${srt.text}\n\n`;
     })
     .join('');
@@ -85,41 +112,7 @@ const convertAssToSrt = (assText: string): string => {
   return output;
 };
 
-// Helper function to convert ASS time to integer for sorting
-const assTime2Int = (assTime: string): number => {
-  return parseInt(assTime.replace(/[^0-9]/g, ''));
-};
-
-// Helper function to convert ASS time format to SRT time format
-const assTime2SrtTime = (assTime: string): string => {
-  let h = '00',
-    m = '00',
-    s = '00',
-    ms = '000';
-  const t = assTime.split(':');
-  if (t.length > 0) h = t[0].length === 1 ? '0' + t[0] : t[0];
-  if (t.length > 1) m = t[1].length === 1 ? '0' + t[1] : t[1];
-  if (t.length > 2) {
-    const t2 = t[2].split('.');
-    if (t2.length > 0) s = t2[0].length === 1 ? '0' + t2[0] : t2[0];
-    if (t2.length > 1)
-      ms = t2[1].length === 2 ? '0' + t2[1] : t2[1].length === 1 ? '00' + t2[1] : t2[1];
-  }
-  return `${h}:${m}:${s},${ms}`;
-};
-
-const textStyles = {
-  none: '',
-  outline: `black 0px 0px 3px, black 0px 0px 3px, black 0px 0px 3px, black 0px 0px 3px, black 0px 0px 3px`,
-  raised: `black 0px 0px 5px, black 0px 1px 5px, black 0px 2px 5px`,
-  depressed: `black 0px -2px 1px`,
-  dropShadow: `black 0px 2px 1px`,
-};
-
-const BASE_FONT_SIZE = 16;
-const LINE_HEIHT_RATIO = 1.333;
-const M3U8_SUBTITLE_REGEX = /.*\.(vtt|srt)/g;
-const requestSubtitle = async (url: string): Promise<string | null> => {
+export const requestSubtitle = async (url: string): Promise<string | null> => {
   try {
     if (url.includes('.ass')) {
       const response = await fetch(url);
@@ -161,6 +154,72 @@ const requestSubtitle = async (url: string): Promise<string | null> => {
   }
 };
 
+export const cleanSubtitleText = (text: string): string => {
+  return text
+    .replace(re_an8, '')
+    .replace(re_font, '')
+    .replace(re_font_close, '')
+    .replace(/<[^>]*>/g, '');
+};
+
+// ============================================================================
+// EXPORTED HOOK: Parse subtitle text into entries
+// ============================================================================
+export const useSubtitleParser = (subtitleText: string | null) => {
+  const [subtitleEntries, setSubtitleEntries] = useState<SubtitleEntry[]>([]);
+  const [usingSrtParser2, setUsingSrtParser2] = useState(true);
+
+  useEffect(() => {
+    if (!subtitleText) {
+      setSubtitleEntries([]);
+      return;
+    }
+
+    try {
+      // Try srt-parser-2 first
+      const parser = new SrtParser2();
+      let entries: SubtitleEntry[] = parser.fromSrt(subtitleText);
+      let usingParser2 = true;
+
+      // If entries is empty, fallback to @plussub/srt-vtt-parser
+      if (!entries || entries.length === 0) {
+        const parseResult = parse(subtitleText);
+        entries = parseResult.entries || [];
+        usingParser2 = false;
+      }
+
+      setSubtitleEntries(entries);
+      setUsingSrtParser2(usingParser2);
+    } catch (error) {
+      console.error('Error parsing subtitles:', error);
+      setSubtitleEntries([{
+        "id": "1",
+        "startTime": "00:00:00,000",
+        "startSeconds": 0,
+        "endTime": "01:00:00,000",
+        "endSeconds": 3600,
+        "text": ">> <i><b>Ocorreu um erro, escolhe outra legenda ou tenta novamente mais tarde.</b></i> <<"
+    }]);
+    }
+  }, [subtitleText]);
+
+  return { subtitleEntries, usingSrtParser2 };
+};
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+const textStyles = {
+  none: '',
+  outline: `black 0px 0px 3px, black 0px 0px 3px, black 0px 0px 3px, black 0px 0px 3px, black 0px 0px 3px`,
+  raised: `black 0px 0px 5px, black 0px 1px 5px, black 0px 2px 5px`,
+  depressed: `black 0px -2px 1px`,
+  dropShadow: `black 0px 2px 1px`,
+};
+
+const BASE_FONT_SIZE = 16;
+const LINE_HEIHT_RATIO = 1.333;
+
 const Subtitle = () => {
   const { state } = useVideoState();
   const { state: subtitleSettings, delayTime } = useSubtitleSettings();
@@ -171,6 +230,7 @@ const Subtitle = () => {
   const [hasAn8, setHasAn8] = useState<boolean>(false);
   const [subtitleText, setSubtitleText] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  
   const subtitle = useMemo(
     () => state.subtitles?.find((sub) => sub.lang === state.currentSubtitle),
     [state.subtitles, state.currentSubtitle]
@@ -193,66 +253,50 @@ const Subtitle = () => {
     getSubtitle();
   }, [subtitle]);
 
+  const { subtitleEntries, usingSrtParser2 } = useSubtitleParser(subtitleText);
+
   useEffect(() => {
-    if (!videoEl) return;
-    let handleSubtitle: () => void = () => {};
-    try {
-      if (!subtitleText) return;
+    if (!videoEl || subtitleEntries.length === 0) return;
+    
+    const handleSubtitle = () => {
+      const currentTime = videoEl.currentTime;
+      let currentEntry: SubtitleEntry | undefined;
       
-      // Try srt-parser-2 first
-      const parser = new SrtParser2();
-      let entries: SubtitleEntry[] = parser.fromSrt(subtitleText);
-      let usingSrtParser2 = true;
-      
-      // If entries is empty, fallback to @plussub/srt-vtt-parser
-      if (!entries || entries.length === 0) {
-        const parseResult = parse(subtitleText);
-        entries = parseResult.entries || [];
-        usingSrtParser2 = false;
+      if (usingSrtParser2) {
+        // Using SrtParser2 format (seconds)
+        currentEntry = subtitleEntries.find(
+          (entry) =>
+            (entry as SrtParser2Entry).startSeconds <= currentTime + delayTime * -0.001 &&
+            (entry as SrtParser2Entry).endSeconds >= currentTime + delayTime * -0.001
+        );
+      } else {
+        // Using @plussub/srt-vtt-parser format (milliseconds)
+        currentEntry = subtitleEntries.find(
+          (entry) =>
+            (entry as PlusSubEntry).from <= currentTime * 1000 + delayTime * -1 &&
+            (entry as PlusSubEntry).to >= currentTime * 1000 + delayTime * -1
+        );
       }
       
-      
-      handleSubtitle = () => {
-        const currentTime = videoEl.currentTime;
-        let currentEntry: SubtitleEntry | undefined;
-        
-        if (usingSrtParser2) {
-          // Using SrtParser2 format (seconds)
-          currentEntry = entries.find(
-            (entry) =>
-              (entry as SrtParser2Entry).startSeconds <= currentTime + delayTime * -0.001 &&
-              (entry as SrtParser2Entry).endSeconds >= currentTime + delayTime * -0.001
-          );
-        } else {
-          // Using @plussub/srt-vtt-parser format (milliseconds)
-          currentEntry = entries.find(
-            (entry) =>
-              (entry as PlusSubEntry).from <= currentTime * 1000 + delayTime * -1 &&
-              (entry as PlusSubEntry).to >= currentTime * 1000 + delayTime * -1
-          );
-        }
-        
-        if (currentEntry) {
-          const cleanedText = currentEntry.text
-              .replace(re_an8, '')
-              .replace(re_font, '')
-              .replace(re_font_close, '');
-          setCurrentText(cleanedText);
-          setHasAn8(re_an8.test(currentEntry.text));
-        } else {
-          setCurrentText('');
-          setHasAn8(false);
-        }
-      };
-      videoEl.addEventListener('timeupdate', handleSubtitle);
-    } catch (error) {
-      console.log('error: ', error);
-      setCurrentText(">> <i><b>Ocorreu um erro, escolhe outra legenda ou tenta novamente mais tarde.</b></i> <<");
-    }
+      if (currentEntry) {
+        const cleanedText = currentEntry.text
+            .replace(re_an8, '')
+            .replace(re_font, '')
+            .replace(re_font_close, '');
+        setCurrentText(cleanedText);
+        setHasAn8(re_an8.test(currentEntry.text));
+      } else {
+        setCurrentText('');
+        setHasAn8(false);
+      }
+    };
+    
+    videoEl.addEventListener('timeupdate', handleSubtitle);
+    
     return () => {
       videoEl.removeEventListener('timeupdate', handleSubtitle);
     };
-  }, [subtitleText, delayTime, videoEl]);
+  }, [subtitleEntries, usingSrtParser2, delayTime, videoEl]);
 
   const fontSize = useMemo(() => {
     return moderateScale(subtitleSettings.fontSize * BASE_FONT_SIZE);

@@ -80,3 +80,104 @@
   height: 100%;
   opacity: 0;
 }
+/* Add these styles to your existing index.module.css file */
+
+/* Transcript Container */
+.transcriptContainer {
+  margin-top: 1.5rem;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+/* Transcript Header */
+.transcriptHeader {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.transcriptHeader h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.transcriptHint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+}
+
+/* Transcript States */
+.transcriptLoading,
+.transcriptEmpty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+}
+
+/* Transcript List */
+.transcriptList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Transcript Item */
+.transcriptItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.transcriptItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Active Transcript Item */
+.transcriptItemActive {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+.transcriptItemActive:hover {
+  background: rgba(59, 130, 246, 0.25);
+}
+
+/* Transcript Time */
+.transcriptTime {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: grey;
+  min-width: 45px;
+  position: relative;
+}
+
+.transcriptItemActive .transcriptTime {
+  color: rgb(96, 165, 250);
+}
+
+/* Transcript Text */
+.transcriptText {
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+  word-wrap: break-word;
+  overflow: hidden;
+}
+
+.transcriptItemActive .transcriptText {
+  color: #fff;
+  font-weight: 500;
+}

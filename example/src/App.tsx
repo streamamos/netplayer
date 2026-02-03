@@ -43,9 +43,14 @@ const App: React.FC = () => {
           file: "https://dl.opensubtitles.org/en/download/subencoding-utf8/src-api/vrf-19d50c5e/file/1961827955.ass",
         },
         {
-          lang: "(PT BR v2) sssss",
-          language: "(PT BR v2) sssss",
-          file: "https://dl.opensubtitles.org/en/download/subencoding-utf8/src-api/vrf-19d80c58/file/1956832841.srt",
+          lang: "(PT BR v2) error on sub",
+          language: "(PT BR v2) error on sub",
+          file: "https://dl.opensubtitles.org/en/download/subencoding-utf8/src-api/vrf-19d80c58/file/19568ssds32841.srt",
+        },
+        {
+          lang: "(PT BR v2) err not found",
+          language: "(PT BR v2) err not found",
+          file: "https://dl.opensubtsitles.org/en/download/subencoding-utf8/src-api/vrf-19d80c58/file/19568ssds32841.srt",
         },
         {
           lang: "Portuguese (Sem Fonte)",
