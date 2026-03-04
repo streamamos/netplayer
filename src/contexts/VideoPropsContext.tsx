@@ -145,6 +145,7 @@ const defaultI18n: I18n = {
     hd: 'HD',
     showTranscript: 'Show Transcript',
     hideTranscript: 'Hide Transcript',
+    subtitleInfo: 'you can customize and sync subtitles on the Personalization tab',
   },
 };
 

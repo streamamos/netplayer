@@ -103,6 +103,7 @@ const SubtitleContent = ({ scrollToSubtitle }: { scrollToSubtitle: () => void })
 
   return (
     <div className={styles.directMenuContent}>
+      <p className={styles.infoText}>{i18n.settings.subtitleInfo}</p>
       <div 
         className={`${styles.menuItem} ${activeSubtitle === 'off' ? styles.activeMenuItem : ''}`}
         onClick={() => handleSubtitleChange('off')}
