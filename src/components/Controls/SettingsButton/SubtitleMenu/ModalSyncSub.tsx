@@ -42,20 +42,27 @@ const ModalSyncSub = () => {
       return;
     }
 
+    const controller = new AbortController();
     const loadSubtitles = async () => {
       setIsLoadingSubtitles(true);
       try {
-        const text = await requestSubtitle(subtitle.file);
+        const text = await requestSubtitle(subtitle.file, controller.signal);
+        if (controller.signal.aborted) return;
         console.log("loaded subtitle text:");
         setSubtitleText(text);
       } catch (error) {
-        console.error('Error loading subtitles:', error);
-        setSubtitleText(null);
+        if ((error as any).name !== 'AbortError') {
+          console.error('Error loading subtitles:', error);
+          setSubtitleText(null);
+        }
       }
       setIsLoadingSubtitles(false);
     };
 
     loadSubtitles();
+    return () => {
+      controller.abort();
+    };
   }, [subtitle, showTranscript]);
 
   // Parse subtitles using the shared hook

@@ -72,10 +72,26 @@ const App: React.FC = () => {
         //   file: `https://small-cake-fdee.piracya.workers.dev/m3u8-proxy?url=https%3A%2F%2Fvixsrc.to%2Fplaylist%2F173365%3Fb%3D1%26token%3D7a5ed11898460bbdaba04d5ccb3b4926%26expires%3D1772674011%26h%3D1%26lang%3Den&headers=%7B%22Referer%22%3A%22https%3A%2F%2Fvixsrc.to%2Ftv%2F1399%2F1%2F1%22%2C%22User-Agent%22%3A%22Mozilla%2F5.0%20(Macintosh%3B%20Intel%20Mac%20OS%20X%2010_15_7)%20AppleWebKit%2F537.36%22%7D`,
         //   label: 'auto'
         // },
-        {
-          file: `https://cdn.bitmovin.com/content/assets/sintel/hls/playlist.m3u8`,
-          label: 'auto'
-        },
+        // {
+        //   file: `https://zef.magnificentthunderstormkaleidoscope.online/proxy/m3u8/https%3A%2F%2Fp.10020.workers.dev%2Fs%2Fafc7d47f%2Fma9yIsUHLd1oEUKmveBRD7YAa6TtBq8pQ3HlTrfwAmaCVWKODqhjdHV_akF-4XHWSYkxv7g5M65u0rl9tQPgWeM0gEd0nnwS9MDPbpIaPg99jm5AmmxzBZIeJx5B8UV6DnJjteoQ6vaA4M5ys_iDjXQ9l6UWSS95PuM7APbpf0O17HcpCIkHx6wtHwjgxL7awPpg-bttsWpV1ol7q9ryIy2jFpi83R3xBxluvtXouvFn-cQu2u3GQ34OOJhwkLiq7Q1bwv2s4CgdkfzHHlq1hKXYiHD9iiDW-_3Z8tmiMeo.m3u8/%7B%22referer%22%3A%22https%3A%2F%2Fhexa.su%2F%22%7D`,
+        //   label: 'auto'
+        // },
+        //  {
+        //    file: `https://cdn.bitmovin.com/content/assets/sintel/hls/playlist.m3u8`,
+        //    label: 'auto'
+        //  },
+           {
+            file: `http://sample.vodobox.com/planete_interdite/planete_interdite_alternate.m3u8`,
+            label: 'auto'
+          },
+        //   {
+        //    file: `https://i-arch-400.fikka407bis.com/stream2/i-arch-400/db40f8c9470f0af1174ffbff030cc805/MJTMsp1RshGTygnMNRUR2N2MSlnWXZEdMNDZzQWe5MDZzMmdZJTO1R2RWVHZDljekhkSsl1VwYnWtx2cihVT21EVCpWWU5kaNR0Yzo1RZRTTqtGePRVT31kMRVjWHl0MPRVS61keG1mTEVUP:1773262617:94.61.244.111:73c543a819deb863bb0139ee21a420f70a75571d94b22bc52d71e3c2a35f4b12:=8EVRVnTqVUdNpWUwwkaFhXTR1TP/index.m3u8`,
+        //    label: 'auto'
+        //  },
+        //         {
+        //   file: `https://zef.magnificentthunderstormkaleidoscope.online/proxy/m3u8/https%3A%2F%2Fp.10020.workers.dev%2Fs%2Fafc7d47f%2Fma9yIsUHLd1oEUKmveBRD7YAa6TtBq8pQ3HlTrfwAmaCVWKODqhjdHV_akF-4XHWcRocgwz6yRQ1iFcUQQz7YiTtGlkZ3FLsduH5KbMLpc8YwNcjzKDVF87GacqO_xvWZkoE4KsxACK_ABoNmguw3U3NT5DpY_HqTUW0JrvfD2YPj_3S2_AnRDm1NLQe3gzUnnHlWKr1tO8wcG6yYO3epfo_rmpqA8Jg6hl74uah9RRxS16eHDErh81zC3HrqubSvZLgkOo8FImz6aM7p49BcYPCKFDqMqejMdGgp8m9cjg.m3u8/%7B%22referer%22%3A%22https%3A%2F%2Fhexa.su%2F%22%7D`,
+        //   label: 'auto'
+        // },
         // {
         //   file: `https://test-streams.mux.dev/x36xhzz/url_8/193039199_mp4_h264_aac_fhd_7.m3u8`,
         //   label: '1080'

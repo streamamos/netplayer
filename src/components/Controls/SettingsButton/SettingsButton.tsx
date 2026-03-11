@@ -22,6 +22,7 @@ import FontOpacityIcon from '../../icons/FontOpacityIcon';
 import ColorIcon from '../../icons/ColorIcon';
 import BlurIcon from '../../icons/BlurIcon';
 import CheckIcon from '../../icons/CheckIcon';
+import AudioIcon from '../../icons/AudioIcon';
 import ModalSyncSub from './SubtitleMenu/ModalSyncSub';
 import SubtitleUpload from './SubtitleMenu/SubtitleUpload';
 
@@ -73,6 +74,13 @@ const SubtitleContent = ({ scrollToSubtitle }: { scrollToSubtitle: () => void })
     }));
   };
 
+  const handleAudioChange = (value: string) => {
+    setState((prev) => ({
+      ...prev,
+      currentAudio: value,
+    }));
+  };
+
   const getLangSVG = (lang: string) => {
     if (lang.includes('BR v')) {
       return (
@@ -101,8 +109,29 @@ const SubtitleContent = ({ scrollToSubtitle }: { scrollToSubtitle: () => void })
     ? state?.subtitles?.[0]?.lang
     : state.currentSubtitle;
 
+  const activeAudio = !state.currentAudio ? state?.audios?.[0]?.lang : state.currentAudio;
+
   return (
     <div className={styles.directMenuContent}>
+      {state.audios.length > 1 && (
+        <div className={styles.settingsSection} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem' }}>
+          <div className={styles.sectionTitle}><AudioIcon />{i18n.settings.audio}</div>
+          <div className={styles.optionsGrid}>
+            {state.audios.map((audio) => (
+              <div
+                key={audio.lang}
+                className={`${styles.menuItem} ${activeAudio === audio.lang ? styles.activeMenuItem : ''}`}
+                onClick={() => handleAudioChange(audio.lang)}
+              >
+                {activeAudio === audio.lang && (
+                  <span className={styles.menuItemCheckIcon}></span>
+                )}
+                <span>{audio.language}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <p className={styles.infoText}>{i18n.settings.subtitleInfo}</p>
       <div 
         className={`${styles.menuItem} ${activeSubtitle === 'off' ? styles.activeMenuItem : ''}`}
@@ -371,7 +400,8 @@ const HorizontalMenu = React.memo(() => {
 
   const scrollToSubtitle = () => {
     if (contentRef.current) {
-      const selectedSubtitle = contentRef.current.querySelector(`.${styles.activeMenuItem}`);
+      // Specifically target items with data-lang attribute (subtitles) that are also active
+      const selectedSubtitle = contentRef.current.querySelector(`[data-lang].${styles.activeMenuItem}`);
       if (selectedSubtitle) {
         selectedSubtitle.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else {

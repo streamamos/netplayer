@@ -149,15 +149,26 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
             //   }));
             // });
             _hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, (_, event) => {
-              const modifiedAudios = event.audioTracks.map((track, index) => ({
-                lang: track.lang || index.toString(),
-                language: track.name,
-              }));
-              setState(() => ({
+              const nameCount = new Map<string, number>();
+              const modifiedAudios = event.audioTracks.map((track, index) => {
+                const baseName = track.name || track.lang || 'Audio';
+                const count = nameCount.get(baseName) || 0;
+                nameCount.set(baseName, count + 1);
+
+                const languageName =
+                  count > 0 ? `${baseName} ${count + 1}` : baseName;
+
+                return {
+                  lang: `${track.lang || 'audio'}-${index}`,
+                  language: languageName,
+                };
+              });
+              setState((prev) => ({
+                ...prev,
                 audios: modifiedAudios,
                 currentAudio:
                   modifiedAudios[_hls.audioTrack >= 0 ? _hls.audioTrack : 0]
-                    ?.lang,
+                    ?.lang || null,
               }));
             });
             _hls.on(Hls.Events.ERROR, function (event, data) {

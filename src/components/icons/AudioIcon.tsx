@@ -9,7 +9,7 @@ const AudioIcon = (props: SVGProps<SVGSVGElement>) => (
     width="1em"
     height="1em"
     viewBox="0 0 24 24"
-    style={{ width: '100%', height: '100%' }}
+    style={{ width: '18px', height: '18px' }}
     {...props}
   >
     <path

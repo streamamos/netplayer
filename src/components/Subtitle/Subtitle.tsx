@@ -112,10 +112,13 @@ export const convertAssToSrt = (assText: string): string => {
   return output;
 };
 
-export const requestSubtitle = async (url: string): Promise<string | null> => {
+export const requestSubtitle = async (
+  url: string,
+  signal?: AbortSignal
+): Promise<string | null> => {
   try {
     if (url.includes('.ass')) {
-      const response = await fetch(url);
+      const response = await fetch(url, { signal });
       const buffer = await response.arrayBuffer();
       const initialText = new TextDecoder('utf-8').decode(buffer);
       const srtText = convertAssToSrt(initialText);
@@ -127,7 +130,7 @@ export const requestSubtitle = async (url: string): Promise<string | null> => {
       return text;
     }
     if (url.includes('vtt') || url.includes('srt')) {
-      const response = await fetch(url);
+      const response = await fetch(url, { signal });
       const buffer = await response.arrayBuffer();
       const decoderUtf8 = new TextDecoder('utf-8');
       const decoderAnsi = new TextDecoder('windows-1252');
@@ -137,7 +140,7 @@ export const requestSubtitle = async (url: string): Promise<string | null> => {
       return text;
     }
     if (url.includes('m3u8')) {
-      const response = await fetch(url);
+      const response = await fetch(url, { signal });
       const text = await response.text();
       const matches = text.match(M3U8_SUBTITLE_REGEX);
       if (!matches?.length) return null;
@@ -145,11 +148,15 @@ export const requestSubtitle = async (url: string): Promise<string | null> => {
       const nextUrl = isValidUrl(matches[0])
         ? matches[0]
         : buildAbsoluteURL(url, matches[0]);
-      return requestSubtitle(nextUrl);
+      return requestSubtitle(nextUrl, signal);
     }
     return null;
   } catch (error) {
-    console.log('error text: ', error);
+    if ((error as any).name === 'AbortError') {
+      console.log('Subtitle fetch aborted');
+    } else {
+      console.log('error text: ', error);
+    }
     return null;
   }
 };
@@ -238,10 +245,12 @@ const Subtitle = () => {
 
   useEffect(() => {
     if (!subtitle?.file) return;
+    const controller = new AbortController();
     const getSubtitle = async () => {
       setIsLoading(true);
       setCurrentText("");
-      const text = await requestSubtitle(subtitle.file);
+      const text = await requestSubtitle(subtitle.file, controller.signal);
+      if (controller.signal.aborted) return;
       setIsLoading(false);
       if (!text) {
         setCurrentText(">> <i><b>Ocorreu um erro, escolhe outra legenda ou tenta novamente mais tarde.</b></i> <<");
@@ -251,6 +260,9 @@ const Subtitle = () => {
       setSubtitleText(text);
     };
     getSubtitle();
+    return () => {
+      controller.abort();
+    };
   }, [subtitle]);
 
   const { subtitleEntries, usingSrtParser2 } = useSubtitleParser(subtitleText);
