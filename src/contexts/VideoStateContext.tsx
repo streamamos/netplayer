@@ -129,17 +129,24 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
     return { ...newState, ...filteredSettings, currentSubtitle };
   }, [defaultState, props?.defaultVideoState]);
   const [state, setState] = React.useState<VideoState>(getState);
+  const prevSourcesRef = React.useRef(props.sources);
+
   useEffect(() => {
     const newState = getState();
+    const currentSourcesStr = JSON.stringify(props.sources);
+    const prevSourcesStr = JSON.stringify(prevSourcesRef.current);
+    const sourcesChanged = currentSourcesStr !== prevSourcesStr;
+
     setState((prev) => ({
       ...prev,
       ...newState,
-      // Preserve dynamic data detected by the player (audios and qualities)
-      // unless they are explicitly provided in the new state (e.g. via props)
-      audios: prev.audios.length > 0 ? prev.audios : newState.audios,
-      qualities: prev.qualities.length > 0 ? prev.qualities : newState.qualities,
+      // If sources have changed (new episode), reset audios.
+      // Otherwise, preserve the current detected audios to avoid disappearing UI on re-renders.
+      audios: sourcesChanged ? newState.audios : (prev.audios.length > 0 ? prev.audios : newState.audios),
     }));
-  }, [getState]);
+
+    prevSourcesRef.current = props.sources;
+  }, [getState, props.sources]);
   useEffect(() => {
     const {
       currentAudio,
