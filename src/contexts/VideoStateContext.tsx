@@ -130,8 +130,15 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
   }, [defaultState, props?.defaultVideoState]);
   const [state, setState] = React.useState<VideoState>(getState);
   useEffect(() => {
-    const state = getState();
-    setState(state);
+    const newState = getState();
+    setState((prev) => ({
+      ...prev,
+      ...newState,
+      // Preserve dynamic data detected by the player (audios and qualities)
+      // unless they are explicitly provided in the new state (e.g. via props)
+      audios: prev.audios.length > 0 ? prev.audios : newState.audios,
+      qualities: prev.qualities.length > 0 ? prev.qualities : newState.qualities,
+    }));
   }, [getState]);
   useEffect(() => {
     const {
