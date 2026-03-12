@@ -163,13 +163,30 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
                   language: languageName,
                 };
               });
-              setState((prev) => ({
-                ...prev,
-                audios: modifiedAudios,
-                currentAudio:
-                  modifiedAudios[_hls.audioTrack >= 0 ? _hls.audioTrack : 0]
-                    ?.lang || null,
-              }));
+
+              setState((prev) => {
+                 const currentAudio = prev.currentAudio;
+                 let matchedAudio = modifiedAudios.find(
+                   (a) => a.lang === currentAudio
+                 );
+
+                 // If no exact match (e.g. index changed between episodes), try matching by base language
+                 if (!matchedAudio && currentAudio) {
+                   const baseLang = currentAudio.split('-')[0];
+                   matchedAudio = modifiedAudios.find(
+                     (a) => a.lang.split('-')[0] === baseLang
+                   );
+                 }
+
+                 return {
+                   ...prev,
+                   audios: modifiedAudios,
+                   currentAudio: matchedAudio
+                     ? matchedAudio.lang
+                     : modifiedAudios[_hls.audioTrack >= 0 ? _hls.audioTrack : 0]
+                         ?.lang || null,
+                 };
+               });
             });
             _hls.on(Hls.Events.ERROR, function (event, data) {
               console.log('ERROR:', event, data);
@@ -340,9 +357,11 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
       const currentAudioTrack = state.audios.findIndex(
         (audio) => audio.lang === currentAudio
       );
-      hls.current.audioTrack = currentAudioTrack;
+      if (currentAudioTrack !== -1 && hls.current.audioTrack !== currentAudioTrack) {
+        hls.current.audioTrack = currentAudioTrack;
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [state?.currentAudio]);
+    }, [state?.currentAudio, state?.audios]);
     return (
       <video
         ref={playerRef}
