@@ -81,9 +81,14 @@ const App: React.FC = () => {
         //    label: 'auto'
         //  },
            {
-            file: `http://sample.vodobox.com/planete_interdite/planete_interdite_alternate.m3u8`,
+            file: `https://cdn.bitmovin.com/content/assets/sintel/hls/playlist.m3u8`,
             label: 'auto'
           },
+          //  {
+          //   file: `https://zef.magnificentthunderstormkaleidoscope.online/proxy/m3u8/https%3A%2F%2Fp.10020.workers.dev%2Fs%2Fafc7d47f%2Fma9yIsUHLd1oEUKmveBRD7YAa6TtBq8pQ3HlTrfwAmaCVWKODqhjdHV_akF-4XHWIKt7bx_NpowA2x84WtRtg5Jk6PfF4_xrX9fRG6y7npnah0lJw7PExA0MaBy6JFKoO2UGqU03hO90yD_Xf7iOC6e-VYvo_GkSSyNBGvqVYdvAYH3LoDSmPi4MMS8QLnGmgNne7q3n4PJhqhREeDbiSWDpt_4t9Vtr-OgHYAr8WpefI1EcugBM-mLn9T4gfZC53qlJy25CmL3hXdnhrfMMfdLbPLA3pjj94uasquAj9hI.m3u8/%7B%22referer%22%3A%22https%3A%2F%2Fhexa.su%2F%22%7D`,
+          //   label: '1080'
+          // },
+          
         //   {
         //    file: `https://i-arch-400.fikka407bis.com/stream2/i-arch-400/db40f8c9470f0af1174ffbff030cc805/MJTMsp1RshGTygnMNRUR2N2MSlnWXZEdMNDZzQWe5MDZzMmdZJTO1R2RWVHZDljekhkSsl1VwYnWtx2cihVT21EVCpWWU5kaNR0Yzo1RZRTTqtGePRVT31kMRVjWHl0MPRVS61keG1mTEVUP:1773262617:94.61.244.111:73c543a819deb863bb0139ee21a420f70a75571d94b22bc52d71e3c2a35f4b12:=8EVRVnTqVUdNpWUwwkaFhXTR1TP/index.m3u8`,
         //    label: 'auto'

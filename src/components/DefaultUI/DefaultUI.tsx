@@ -69,17 +69,22 @@ const DefaultUI = React.forwardRef<HTMLVideoElement, NetPlayerProps>(
     );
     const handleDoubleTap: React.DOMAttributes<HTMLDivElement>['onTouchStart'] =
       React.useCallback((e) => {
-        if (!videoRef.current) return;
-        const { clientX } = e.changedTouches[0];
-        const widthPercent = 45;
-        const width = (window.innerWidth * widthPercent) / 100;
-        if (clientX < width) {
-          backIndicatorRef?.current?.show();
-          videoRef.current.currentTime = videoRef.current.currentTime - 10;
-        } else if (clientX > window.innerWidth - width) {
-          forwardIndicatorRef?.current?.show();
-          videoRef.current.currentTime = videoRef.current.currentTime + 10;
-        }
+
+        //THIS JUST DISABLES THE DEFAULT DOUBLE TAP FUNCTIONALITY
+        console.log("Is tap feature activated?", !e);
+        return;
+
+        // if (!videoRef.current) return;
+        // const { clientX } = e.changedTouches[0];
+        // const widthPercent = 45;
+        // const width = (window.innerWidth * widthPercent) / 100;
+        // if (clientX < width) {
+        //   backIndicatorRef?.current?.show();
+        //   videoRef.current.currentTime = videoRef.current.currentTime - 10;
+        // } else if (clientX > window.innerWidth - width) {
+        //   forwardIndicatorRef?.current?.show();
+        //   videoRef.current.currentTime = videoRef.current.currentTime + 10;
+        // }
       }, []);
     const handleTap: React.DOMAttributes<HTMLDivElement>['onTouchStart'] =
       React.useCallback(
