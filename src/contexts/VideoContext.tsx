@@ -96,7 +96,7 @@ export const VideoContextProvider: React.FC<VideoContextProviderProps> = ({
         duration: videoEl.duration,
         buffering: false,
         error: null,
-        paused: false,
+        paused: videoEl.paused,
       });
     };
     const handleEnded = () => {
