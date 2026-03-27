@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { isDesktop, isMobile } from 'react-device-detect';
 import { PLAYER_CONTAINER_CLASS } from '../../../constants';
 import { useVideoProps } from '../../../contexts/VideoPropsContext';
 import Dialog from '../../Dialog';
