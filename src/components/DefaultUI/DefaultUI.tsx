@@ -67,15 +67,15 @@ const DefaultUI = React.forwardRef<HTMLVideoElement, NetPlayerProps>(
       }),
       [components]
     );
-    const handleDoubleTap: React.DOMAttributes<HTMLDivElement>['onTouchStart'] =
-      React.useCallback((e) => {
+    const handleDoubleTap =
+      React.useCallback((e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) => {
 
         //THIS JUST DISABLES THE DEFAULT DOUBLE TAP FUNCTIONALITY
         console.log("Is tap feature activated?", !e);
         return;
 
         // if (!videoRef.current) return;
-        // const { clientX } = e.changedTouches[0];
+        // const { clientX } = 'touches' in e ? e.changedTouches[0] : e;
         // const widthPercent = 45;
         // const width = (window.innerWidth * widthPercent) / 100;
         // if (clientX < width) {
@@ -86,9 +86,9 @@ const DefaultUI = React.forwardRef<HTMLVideoElement, NetPlayerProps>(
         //   videoRef.current.currentTime = videoRef.current.currentTime + 10;
         // }
       }, []);
-    const handleTap: React.DOMAttributes<HTMLDivElement>['onTouchStart'] =
+    const handleTap =
       React.useCallback(
-        (e) => {
+        (e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) => {
           const target = e.target as HTMLDivElement;
           const videoOverlay = document.querySelector('.mobile-overlay');
           if (!videoOverlay) {
@@ -132,9 +132,8 @@ const DefaultUI = React.forwardRef<HTMLVideoElement, NetPlayerProps>(
 
     return (
       <div
-        onClick={!isMobile ? resetInteractingCycle : noop}
+        onClick={isMobile ? onTap : resetInteractingCycle}
         onMouseMove={!isMobile ? resetInteractingCycle : noop}
-        onTouchStart={isMobile ? onTap : noop}
         className={classNames(PLAYER_CONTAINER_CLASS, styles.container, shouldHideCursor && styles.hideCursor)}
       >
         <uiComponents.MobileBackwardIndicator ref={backIndicatorRef} />
