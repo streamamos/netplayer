@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { PLAYER_CONTAINER_CLASS } from '../../../constants';
 import { classNames } from '../../../utils';
-import { isDesktop } from 'react-device-detect';
+import useCheckMobile from '../../../hooks/useCheckMobile';
 import Popover from '../../Popover';
 import { PopoverProps } from '../../Popover/Popover';
 import styles from './ControlButton.module.css';
@@ -20,6 +20,8 @@ const ControlButton: React.FC<ControlButtonProps> = ({
   tooltipProps,
   ...props
 }) => {
+  const isMobile = useCheckMobile();
+  const isDesktop = !isMobile;
   const button = (
     <button
       className={classNames('control-button', styles.controlButton, className)}

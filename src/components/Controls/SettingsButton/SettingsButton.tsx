@@ -11,6 +11,7 @@ import styles from './HorizontalMenu.module.css';
 import { useVideoState } from '../../../contexts/VideoStateContext';
 import { useVideo } from '../../../contexts/VideoContext';
 import { useSubtitleSettings, defaultSubtitleSettings } from '../../../contexts/SubtitleSettingsContext';
+import useCheckMobile from '../../../hooks/useCheckMobile';
 import SubtitleIcon from '../../icons/SubtitleIcon';
 import QualityIcon from '../../icons/QualityIcon';
 import PlaybackSpeedIcon from '../../icons/PlaybackSpeedIcon';
@@ -208,11 +209,11 @@ const QualityContent = () => {
 const SubtitleSettingsContent = () => {
   const { state, setState } = useSubtitleSettings();
   const { i18n } = useVideoProps();
-  const { videoEl } = useVideo();
+  const { videoEl, videoState } = useVideo();
 
   const opacities = [0, 50, 75, 100];
   const speeds = [0.25, 1, 1.5, 2];
-  const currentSpeed = videoEl?.playbackRate || 1;
+  const currentSpeed = videoState.playbackRate;
 
   const colors = [
     { key: 'white', label: i18n.settings.white, style: { color: 'white' } },
@@ -395,6 +396,7 @@ const SubtitleSettingsContent = () => {
 
 const HorizontalMenu = React.memo(() => {
   const { i18n } = useVideoProps();
+  const isMobile = useCheckMobile();
   const [activeTab, setActiveTab] = React.useState('subtitles');
   const contentRef = React.useRef<HTMLDivElement>(null);
 
@@ -465,9 +467,10 @@ const selector = `.${PLAYER_CONTAINER_CLASS}`;
 
 const SettingsButton = () => {
   const { i18n } = useVideoProps();
+  const isMobile = useCheckMobile();
   return (
     <React.Fragment>
-      {isMobile && (
+      {isMobile ? (
         <Dialog
           portalSelector={selector}
           reference={
@@ -478,8 +481,7 @@ const SettingsButton = () => {
         >
           <HorizontalMenu />
         </Dialog>
-      )}
-      {isDesktop && (
+      ) : (
         <Popover
           portalSelector={selector}
           reference={

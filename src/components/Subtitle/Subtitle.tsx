@@ -1,8 +1,8 @@
 import SrtParser2 from 'srt-parser-2';
 import { parse } from '@plussub/srt-vtt-parser';
 import React, { useEffect, useMemo, useState } from 'react';
-import { isDesktop } from 'react-device-detect';
 import { buildAbsoluteURL } from 'url-toolkit';
+import useCheckMobile from '../../hooks/useCheckMobile';
 import { useSubtitleSettings } from '../../contexts/SubtitleSettingsContext';
 import { useVideo } from '../../contexts/VideoContext';
 import { useInteract } from '../../contexts/VideoInteractingContext';
@@ -228,6 +228,8 @@ const BASE_FONT_SIZE = 16;
 const LINE_HEIHT_RATIO = 1.333;
 
 const Subtitle = () => {
+  const isMobile = useCheckMobile();
+  const isDesktop = !isMobile;
   const { state } = useVideoState();
   const { state: subtitleSettings, delayTime } = useSubtitleSettings();
   const { moderateScale } = useTextScaling();

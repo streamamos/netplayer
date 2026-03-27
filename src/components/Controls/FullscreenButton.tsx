@@ -3,13 +3,15 @@ import { PLAYER_CONTAINER_CLASS } from '../../constants';
 import { useVideoProps } from '../../contexts/VideoPropsContext';
 import useHotKey, { parseHotKey } from '../../hooks/useHotKey';
 import { stringInterpolate } from '../../utils';
-import { isIOS, isMobile } from 'react-device-detect';
+import { isIOS } from 'react-device-detect';
+import useCheckMobile from '../../hooks/useCheckMobile';
 import screenfull from '../../utils/screenfull';
 import FullscreenEnterIcon from '../icons/FullscreenEnterIcon';
 import FullscreenExitIcon from '../icons/FullscreenExitIcon';
 import ControlButton from './ControlButton';
 
 const FullscreenButton = () => {
+  const isMobile = useCheckMobile();
   const [isFullscreen, setIsFullscreen] = useState(screenfull.isFullscreen);
   const { i18n } = useVideoProps();
   const hotkey = useHotKey('fullscreen');

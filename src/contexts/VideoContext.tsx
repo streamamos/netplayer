@@ -7,6 +7,7 @@ interface VideoState {
   ended: boolean;
   paused: boolean;
   volume: number;
+  playbackRate: number;
   buffering: boolean;
   error: string | null;
   seeking: boolean;
@@ -30,6 +31,7 @@ const defaultState: VideoState = {
   ended: false,
   paused: true,
   volume: 1,
+  playbackRate: 1,
   seeking: false,
   error: '',
 };
@@ -75,6 +77,7 @@ export const VideoContextProvider: React.FC<VideoContextProviderProps> = ({
       updateState({
         currentTime: videoEl.currentTime,
         duration: videoEl.duration,
+        playbackRate: videoEl.playbackRate,
         buffering: false,
         error: null,
       });
@@ -105,6 +108,9 @@ export const VideoContextProvider: React.FC<VideoContextProviderProps> = ({
     const handleVolumeChange = () => {
       updateState({ volume: videoEl.volume });
     };
+    const handleRateChange = () => {
+      updateState({ playbackRate: videoEl.playbackRate });
+    };
     videoEl.addEventListener('waiting', handleWaiting);
     videoEl.addEventListener('loadeddata', handleloadeddata);
     videoEl.addEventListener('play', handlePlay);
@@ -113,6 +119,7 @@ export const VideoContextProvider: React.FC<VideoContextProviderProps> = ({
     videoEl.addEventListener('timeupdate', handleTimeupdate);
     videoEl.addEventListener('ended', handleEnded);
     videoEl.addEventListener('volumechange', handleVolumeChange);
+    videoEl.addEventListener('ratechange', handleRateChange);
     videoEl.addEventListener('error', handleError);
     return () => {
       videoEl.removeEventListener('waiting', handleWaiting);
@@ -123,6 +130,7 @@ export const VideoContextProvider: React.FC<VideoContextProviderProps> = ({
       videoEl.removeEventListener('timeupdate', handleTimeupdate);
       videoEl.removeEventListener('ended', handleEnded);
       videoEl.removeEventListener('volumechange', handleVolumeChange);
+      videoEl.removeEventListener('ratechange', handleRateChange);
       videoEl.removeEventListener('error', handleError);
     };
   }, [updateState, videoEl]);

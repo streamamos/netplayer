@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { isMobile } from 'react-device-detect';
+import useCheckMobile from '../../hooks/useCheckMobile';
 import { classNames } from '../../utils';
 import Portal from '../Portal';
 import styles from './Dialog.module.css';
@@ -14,6 +14,7 @@ const Dialog: React.FC<DialogProps> = ({
   children,
   portalSelector,
 }) => {
+  const isMobile = useCheckMobile();
   const [portalElement, setPortalElement] = React.useState<Element>(
     document.body
   );

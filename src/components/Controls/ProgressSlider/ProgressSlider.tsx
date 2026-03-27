@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { isDesktop } from 'react-device-detect';
+import useCheckMobile from '../../../hooks/useCheckMobile';
 import { useVideo } from '../../../contexts/VideoContext';
 import { useVideoProps } from '../../../contexts/VideoPropsContext';
 import { classNames, convertTime } from '../../../utils';
@@ -9,6 +9,8 @@ import ThumbnailHover from '../ThumbnailHover';
 import styles from './ProgressSlider.module.css';
 
 const ProgressSlider = () => {
+  const isMobile = useCheckMobile();
+  const isDesktop = !isMobile;
   const { videoEl, setVideoState } = useVideo();
   const { skipsegments } = useVideoProps();
   const [bufferPercent, setBufferPercent] = useState(0);

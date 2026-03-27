@@ -1,3 +1,4 @@
+export { default as useCheckMobile } from './useCheckMobile';
 export { default as useClickOutside } from './useClickOutside';
 export { default as useDoubleTap } from './useDoubleTap';
 export { default as useGlobalHotKeys } from './useGlobalHotKeys';

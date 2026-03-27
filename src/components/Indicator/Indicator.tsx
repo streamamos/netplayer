@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { isDesktop } from 'react-device-detect';
+import useCheckMobile from '../../hooks/useCheckMobile';
 import { PLAYER_CONTAINER_CLASS } from '../../constants';
 import { useInteract } from '../../contexts';
 import { classNames } from '../../utils';
@@ -66,6 +66,8 @@ export const BaseIndicator = React.forwardRef<IndicatorRef, BaseIndicatorProps>(
 
 const Indicator = React.forwardRef<IndicatorRef, BaseIndicatorProps>(
   ({ children, className = '', ...props }, ref) => {
+    const isMobile = useCheckMobile();
+    const isDesktop = !isMobile;
     return isDesktop ? (
       <BaseIndicator
         className={classNames(styles.indicator, className)}

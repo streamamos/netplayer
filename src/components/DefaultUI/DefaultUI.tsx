@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { isMobile } from 'react-device-detect';
 import { useInteract } from '../../contexts/VideoInteractingContext';
 import { useVideo } from '../../contexts/VideoContext';
 import { Components, NetPlayerProps } from '../../contexts/VideoPropsContext';
 import useDoubleTap from '../../hooks/useDoubleTap';
 import useGlobalHotKeys from '../../hooks/useGlobalHotKeys';
+import useCheckMobile from '../../hooks/useCheckMobile';
 import { classNames } from '../../utils';
 import { IndicatorRef } from '../Indicator/Indicator';
 import styles from './DefaultUI.module.css';
@@ -111,6 +111,7 @@ const DefaultUI = React.forwardRef<HTMLVideoElement, NetPlayerProps>(
       tapThreshold: 250,
     });
     useGlobalHotKeys(videoRef.current!);
+    const isMobile = useCheckMobile();
     const playerRef = React.useCallback(
       (node) => {
         videoRef.current = node;
