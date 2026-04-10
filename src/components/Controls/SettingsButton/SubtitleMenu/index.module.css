@@ -82,6 +82,15 @@
 }
 /* Add these styles to your existing index.module.css file */
 
+.transcriptTip {
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+  text-align: center;
+}
+
+
 /* Transcript Container */
 .transcriptContainer {
   margin-top: 1.5rem;

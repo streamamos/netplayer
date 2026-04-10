@@ -232,33 +232,36 @@ const ModalSyncSub = () => {
 
         {/* Subtitle Transcript Section */}
         {showTranscript && !isLoadingSubtitles && subtitleEntries.length > 0 && (
-          <div className={styles.transcriptContainer} ref={transcriptRef}>
-            <div className={styles.transcriptList}>
-              {subtitleEntries.map((entry, index) => {
-                const isActive = index === currentSubIndex;
-                const startTime = usingSrtParser2
-                  ? (entry as SrtParser2Entry).startSeconds
-                  : (entry as PlusSubEntry).from / 1000;
-                const text = cleanSubtitleText(entry.text);
+          <>
+            <p className={styles.transcriptTip}>{i18n.settings.transcriptTip}</p>
+            <div className={styles.transcriptContainer} ref={transcriptRef}>
+              <div className={styles.transcriptList}>
+                {subtitleEntries.map((entry, index) => {
+                  const isActive = index === currentSubIndex;
+                  const startTime = usingSrtParser2
+                    ? (entry as SrtParser2Entry).startSeconds
+                    : (entry as PlusSubEntry).from / 1000;
+                  const text = cleanSubtitleText(entry.text);
 
-                return (
-                  <div
-                    key={`${entry.id}-${index}`}
-                    ref={isActive ? activeSubRef : null}
-                    className={`${styles.transcriptItem} ${
-                      isActive ? styles.transcriptItemActive : ''
-                    }`}
-                    onClick={() => handleSubtitleClick(entry)}
-                  >
-                    <span className={styles.transcriptTime}>
-                      {formatTime(startTime)}
-                    </span>
-                    <span className={styles.transcriptText}>{text}</span>
-                  </div>
-                );
-              })}
+                  return (
+                    <div
+                      key={`${entry.id}-${index}`}
+                      ref={isActive ? activeSubRef : null}
+                      className={`${styles.transcriptItem} ${
+                        isActive ? styles.transcriptItemActive : ''
+                      }`}
+                      onClick={() => handleSubtitleClick(entry)}
+                    >
+                      <span className={styles.transcriptTime}>
+                        {formatTime(startTime)}
+                      </span>
+                      <span className={styles.transcriptText}>{text}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>
