@@ -10,7 +10,8 @@ import PlayPauseButton from './PlayPauseButton';
 import ProgressSlider from './ProgressSlider';
 // import ScreenshotButton from './ScreenshotButton';
 import SettingsButton from './SettingsButton';
-// import SubtitleButton from './SubtitleButton';
+import SubtitleButton from './SubtitleButton';
+import AudioButton from './AudioButton';
 import TimeIndicator from './TimeIndicator';
 import VolumeButton from './VolumeButton';
 
@@ -39,8 +40,9 @@ const Controls = () => {
           <TimeIndicator />
         </div>
         <div className={styles.rightButtonContainer}>
-          {/* <ScreenshotButton />
-          <SubtitleButton /> */}
+          {/* <ScreenshotButton /> */}
+          <AudioButton />
+          <SubtitleButton />
           <SettingsButton />
           <FullscreenButton />
         </div>

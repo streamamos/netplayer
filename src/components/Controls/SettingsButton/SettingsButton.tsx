@@ -393,14 +393,18 @@ const SubtitleSettingsContent = () => {
   );
 };
 
-const HorizontalMenu = React.memo(() => {
+const HorizontalMenu = React.memo(({ initialTab = 'subtitles', initialScrollTo }: { initialTab?: string, initialScrollTo?: 'audio' | 'subtitle' }) => {
   const { i18n } = useVideoProps();
   const isMobile = useCheckMobile();
-  const [activeTab, setActiveTab] = React.useState('subtitles');
+  const [activeTab, setActiveTab] = React.useState(initialTab);
   const contentRef = React.useRef<HTMLDivElement>(null);
 
-  const scrollToSubtitle = () => {
+  const scrollToSubtitle = React.useCallback(() => {
     if (contentRef.current) {
+      if (initialScrollTo === 'audio') {
+        contentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
       // Specifically target items with data-lang attribute (subtitles) that are also active
       const selectedSubtitle = contentRef.current.querySelector(`[data-lang].${styles.activeMenuItem}`);
       if (selectedSubtitle) {
@@ -409,7 +413,7 @@ const HorizontalMenu = React.memo(() => {
         contentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
-  };
+  }, [initialScrollTo]);
 
   const handleTabChange = (tabKey: string) => {
     setActiveTab(tabKey);
@@ -464,9 +468,20 @@ HorizontalMenu.displayName = 'HorizontalMenu';
 
 const selector = `.${PLAYER_CONTAINER_CLASS}`;
 
-const SettingsButton = () => {
+interface SettingsButtonProps {
+  icon?: React.ReactNode;
+  tooltip?: string;
+  initialTab?: string;
+  initialScrollTo?: 'audio' | 'subtitle';
+}
+
+const SettingsButton = ({ icon, tooltip, initialTab, initialScrollTo }: SettingsButtonProps) => {
   const { i18n } = useVideoProps();
   const isMobile = useCheckMobile();
+  
+  const defaultTab = isMobile ? 'subtitles' : 'settings';
+  const tabToUse = initialTab || defaultTab;
+
   return (
     <React.Fragment>
       {isMobile ? (
@@ -474,24 +489,25 @@ const SettingsButton = () => {
           portalSelector={selector}
           reference={
             <ControlButton>
-              <SettingsIcon />
+              {icon || <SettingsIcon />}
             </ControlButton>
           }
         >
-          <HorizontalMenu />
+          <HorizontalMenu initialTab={tabToUse} initialScrollTo={initialScrollTo} />
         </Dialog>
       ) : (
         <Popover
           portalSelector={selector}
           reference={
-            <ControlButton tooltip={i18n.controls.settings}>
-              <SettingsIcon />
+            <ControlButton tooltip={tooltip || i18n.controls.settings}>
+              {icon || <SettingsIcon />}
             </ControlButton>
           }
           position="top"
           overflowElement={selector}
+          unmountOnClose={true}
         >
-          <HorizontalMenu />
+          <HorizontalMenu initialTab={tabToUse} initialScrollTo={initialScrollTo} />
         </Popover>
       )}
     </React.Fragment>

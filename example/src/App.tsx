@@ -83,7 +83,11 @@ const App: React.FC = () => {
            {
             file: `https://cdn.bitmovin.com/content/assets/sintel/hls/playlist.m3u8`,
             label: 'auto'
-          },
+        },
+          //  {
+          //   file: `https://cdn.bitmovin.com/content/assets/sintel/hls/playlist.m3u8`,
+          //   label: 'auto'
+          // },
           //  {
           //   file: `https://zef.magnificentthunderstormkaleidoscope.online/proxy/m3u8/https%3A%2F%2Fp.10020.workers.dev%2Fs%2Fafc7d47f%2Fma9yIsUHLd1oEUKmveBRD7YAa6TtBq8pQ3HlTrfwAmaCVWKODqhjdHV_akF-4XHWIKt7bx_NpowA2x84WtRtg5Jk6PfF4_xrX9fRG6y7npnah0lJw7PExA0MaBy6JFKoO2UGqU03hO90yD_Xf7iOC6e-VYvo_GkSSyNBGvqVYdvAYH3LoDSmPi4MMS8QLnGmgNne7q3n4PJhqhREeDbiSWDpt_4t9Vtr-OgHYAr8WpefI1EcugBM-mLn9T4gfZC53qlJy25CmL3hXdnhrfMMfdLbPLA3pjj94uasquAj9hI.m3u8/%7B%22referer%22%3A%22https%3A%2F%2Fhexa.su%2F%22%7D`,
           //   label: '1080'
@@ -97,10 +101,10 @@ const App: React.FC = () => {
         //   file: `https://zef.magnificentthunderstormkaleidoscope.online/proxy/m3u8/https%3A%2F%2Fp.10020.workers.dev%2Fs%2Fafc7d47f%2Fma9yIsUHLd1oEUKmveBRD7YAa6TtBq8pQ3HlTrfwAmaCVWKODqhjdHV_akF-4XHWcRocgwz6yRQ1iFcUQQz7YiTtGlkZ3FLsduH5KbMLpc8YwNcjzKDVF87GacqO_xvWZkoE4KsxACK_ABoNmguw3U3NT5DpY_HqTUW0JrvfD2YPj_3S2_AnRDm1NLQe3gzUnnHlWKr1tO8wcG6yYO3epfo_rmpqA8Jg6hl74uah9RRxS16eHDErh81zC3HrqubSvZLgkOo8FImz6aM7p49BcYPCKFDqMqejMdGgp8m9cjg.m3u8/%7B%22referer%22%3A%22https%3A%2F%2Fhexa.su%2F%22%7D`,
         //   label: 'auto'
         // },
-        // {
-        //   file: `https://test-streams.mux.dev/x36xhzz/url_8/193039199_mp4_h264_aac_fhd_7.m3u8`,
-        //   label: '1080'
-        // },
+        //  {
+        //    file: `https://test-streams.mux.dev/x36xhzz/url_8/193039199_mp4_h264_aac_fhd_7.m3u8`,
+        //    label: '1080'
+        //  },
         // {
         //   file: `https://test-streams.mux.dev/x36xhzz/url_0/193039199_mp4_h264_aac_hd_7.m3u8`,
         //   label: '720'

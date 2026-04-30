@@ -9,12 +9,12 @@ const AudioIcon = (props: SVGProps<SVGSVGElement>) => (
     width="1em"
     height="1em"
     viewBox="0 0 24 24"
-    style={{ width: '18px', height: '18px' }}
+    style={{ width: '18px', height: '18px', scale: '0.9' }}
     {...props}
   >
     <path
       fill="currentColor"
-      d="M12 5v8.55c-.94-.54-2.1-.75-3.33-.32-1.34.48-2.37 1.67-2.61 3.07a4.007 4.007 0 0 0 4.59 4.65c1.96-.31 3.35-2.11 3.35-4.1V7h2c1.1 0 2-.9 2-2s-.9-2-2-2h-2c-1.1 0-2 .9-2 2z"
+      d="M12 1a9 9 0 0 0-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7a9 9 0 0 0-9-9z"
     />
   </svg>
 );

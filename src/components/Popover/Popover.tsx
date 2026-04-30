@@ -10,6 +10,7 @@ export interface PopoverProps extends Partial<UsePopoverOptions> {
   popperProps?: React.HTMLAttributes<HTMLElement>;
   type?: 'click' | 'hover';
   portalSelector?: string;
+  unmountOnClose?: boolean;
 }
 
 const noop = () => {};
@@ -21,6 +22,7 @@ const Popover: React.FC<PopoverProps> = ({
   referenceProps = {},
   type = 'click',
   portalSelector,
+  unmountOnClose,
   ...options
 }) => {
   const [portalElement, setPortalElement] = useState<Element>(document.body);
@@ -84,7 +86,7 @@ const Popover: React.FC<PopoverProps> = ({
           ref={floatingRef}
           {...popperRest}
         >
-          {children}
+          {unmountOnClose ? (isOpen ? children : null) : children}
         </div>
         {isOpen && type === 'click' && (
           <div
