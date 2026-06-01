@@ -187,19 +187,22 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
       
       return false;
     })();
-    
-    // Don't save if it's "(Sem Fonte)" or a fallback selection
-    if (!currentSubtitle?.includes("(Sem Fonte)") && !isFallbackSelection) {
-      localStorage.setItem(
-        LOCALSTORAGE_KEY,
-        JSON.stringify({
-          currentAudio,
-          currentQuality,
-          currentSubtitle,
-          isSubtitleDisabled,
-        })
-      );
-    }
+    const rawSettings = localStorage.getItem(LOCALSTORAGE_KEY);
+    const previousSettings = rawSettings ? JSON.parse(rawSettings) : {};
+    const shouldPreserveSubtitle =
+      !!currentSubtitle?.match(/\(sem fonte\)/i) || isFallbackSelection;
+
+    localStorage.setItem(
+      LOCALSTORAGE_KEY,
+      JSON.stringify({
+        currentAudio,
+        currentQuality,
+        currentSubtitle: shouldPreserveSubtitle
+          ? previousSettings.currentSubtitle ?? null
+          : currentSubtitle,
+        isSubtitleDisabled,
+      })
+    );
   }, [state]);
   const updateState: UpdateStateAction = (stateSelector) => {
     setState((prev) => ({ ...prev, ...stateSelector(prev) }));
