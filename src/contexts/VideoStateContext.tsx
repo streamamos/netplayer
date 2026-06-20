@@ -195,6 +195,7 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
     localStorage.setItem(
       LOCALSTORAGE_KEY,
       JSON.stringify({
+        ...previousSettings,
         currentAudio,
         currentQuality,
         currentSubtitle: shouldPreserveSubtitle

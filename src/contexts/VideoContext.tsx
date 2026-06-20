@@ -24,6 +24,48 @@ interface VideoContextProviderProps {
   hlsRef: React.RefObject<Hls>;
 }
 
+const LOCALSTORAGE_KEY = 'netplayer_video_settings';
+
+const getStoredVolume = () => {
+  const rawSettings = localStorage.getItem(LOCALSTORAGE_KEY);
+
+  if (!rawSettings) return 1;
+
+  try {
+    const settings = JSON.parse(rawSettings);
+    const volume = settings?.volume;
+
+    if (typeof volume === 'number' && volume >= 0 && volume <= 1) {
+      return volume;
+    }
+  } catch {
+    return 1;
+  }
+
+  return 1;
+};
+
+const setStoredVolume = (volume: number) => {
+  const rawSettings = localStorage.getItem(LOCALSTORAGE_KEY);
+  let previousSettings = {};
+
+  if (rawSettings) {
+    try {
+      previousSettings = JSON.parse(rawSettings);
+    } catch {
+      previousSettings = {};
+    }
+  }
+
+  localStorage.setItem(
+    LOCALSTORAGE_KEY,
+    JSON.stringify({
+      ...previousSettings,
+      volume,
+    })
+  );
+};
+
 const defaultState: VideoState = {
   currentTime: 0,
   buffering: true,
@@ -61,6 +103,15 @@ export const VideoContextProvider: React.FC<VideoContextProviderProps> = ({
     if (!hlsRef?.current) return;
     setHls(hlsRef.current);
   }, [hlsRef]);
+  useEffect(() => {
+    if (!videoEl) return;
+
+    const storedVolume = getStoredVolume();
+
+    videoEl.volume = storedVolume;
+    updateState({ volume: storedVolume });
+    setStoredVolume(storedVolume);
+  }, [updateState, videoEl]);
   useEffect(() => {
     if (!videoEl) return;
     const handleError = () => {
@@ -106,6 +157,7 @@ export const VideoContextProvider: React.FC<VideoContextProviderProps> = ({
       updateState({ ended: true, paused: true });
     };
     const handleVolumeChange = () => {
+      setStoredVolume(videoEl.volume);
       updateState({ volume: videoEl.volume });
     };
     const handleRateChange = () => {
