@@ -35,6 +35,16 @@ const shouldPlayDash = (source: Source) =>
 
 const noop = () => {};
 
+const getHlsQualityLabels = (levels: Hls['levels']) =>
+  Array.from(
+    new Set(
+      levels
+        .sort((a, b) => b.height - a.height)
+        .filter((level) => level.height)
+        .map((level) => `${level.height}`)
+    )
+  );
+
 const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
   (
     {
@@ -120,16 +130,24 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
                     );
                 }
                 if (sources.length > 1) return;
-                if (!_hls.levels?.length) return;
-                const levels: string[] = _hls.levels
-                  .sort((a, b) => b.height - a.height)
-                  .filter((level) => level.height)
-                  .map((level) => `${level.height}p`);
-                const level = preferQuality?.(levels) || levels[0];
-                setState(() => ({
-                  qualities: levels,
-                  currentQuality: level,
-                }));
+                const levels = getHlsQualityLabels(_hls.levels || []);
+                const qualities = ['auto', ...levels];
+                const preferredQuality = preferQuality?.(levels);
+                setState((prev) => {
+                  const nextQuality =
+                    (prev.currentQuality && qualities.includes(prev.currentQuality)
+                      ? prev.currentQuality
+                      : null) ||
+                    (preferredQuality && qualities.includes(preferredQuality)
+                      ? preferredQuality
+                      : null) ||
+                    'auto';
+                  return {
+                    ...prev,
+                    qualities,
+                    currentQuality: nextQuality,
+                  };
+                });
               });
             });
 
@@ -220,7 +238,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
           }
           innerRef.current.addEventListener('loadeddata', () => {
             const bitrates = player.getBitrateInfoListFor('video');
-            const qualities = bitrates.map((birate) => birate.height + 'p');
+            const qualities = bitrates.map((birate) => birate.height.toString());
             const bestQuality = (() => {
               const quality = bitrates.find((bitrate) => {
                 const quality =
@@ -303,6 +321,10 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         // Check if the playlist gave us qualities.
         if (!hls?.current?.levels?.length) return;
         if (!currentQuality) return;
+        if (currentQuality === 'auto') {
+          hls.current.currentLevel = -1;
+          return;
+        }
         // Handle changing quality.
         const index = hls.current.levels.findIndex(
           (level) =>
