@@ -136,13 +136,33 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
     const currentSourcesStr = JSON.stringify(props.sources);
     const prevSourcesStr = JSON.stringify(prevSourcesRef.current);
     const sourcesChanged = currentSourcesStr !== prevSourcesStr;
-
     setState((prev) => ({
-      ...prev,
-      ...newState,
-      // If sources have changed (new episode), reset audios.
-      // Otherwise, preserve the current detected audios to avoid disappearing UI on re-renders.
-      audios: sourcesChanged ? newState.audios : (prev.audios.length > 0 ? prev.audios : newState.audios),
+      ...(() => {
+        const shouldPreserveDetectedQualities =
+          !sourcesChanged && prev.qualities.length > newState.qualities.length;
+        const nextQualities = shouldPreserveDetectedQualities
+          ? prev.qualities
+          : newState.qualities;
+        const nextCurrentQuality = shouldPreserveDetectedQualities
+          ? prev.currentQuality && nextQualities.includes(prev.currentQuality)
+            ? prev.currentQuality
+            : newState.currentQuality
+          : newState.currentQuality;
+
+        return {
+          ...prev,
+          ...newState,
+          qualities: nextQualities,
+          currentQuality: nextCurrentQuality,
+          // If sources have changed (new episode), reset audios.
+          // Otherwise, preserve the current detected audios to avoid disappearing UI on re-renders.
+          audios: sourcesChanged
+            ? newState.audios
+            : prev.audios.length > 0
+              ? prev.audios
+              : newState.audios,
+        };
+      })(),
     }));
 
     prevSourcesRef.current = props.sources;
@@ -206,7 +226,10 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
     );
   }, [state]);
   const updateState: UpdateStateAction = (stateSelector) => {
-    setState((prev) => ({ ...prev, ...stateSelector(prev) }));
+    setState((prev) => {
+      const partialState = stateSelector(prev);
+      return { ...prev, ...partialState };
+    });
   };
   return (
     <VideoStateContext.Provider value={{ state, setState: updateState }}>
