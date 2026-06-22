@@ -45,6 +45,15 @@ const getHlsQualityLabels = (levels: Hls['levels']) =>
     )
   );
 
+const getSourcesSignature = (sources: Source[]) =>
+  JSON.stringify(
+    sources.map((source) => ({
+      file: source.file,
+      label: source.label,
+      type: source.type,
+    }))
+  );
+
 const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
   (
     {
@@ -67,6 +76,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
     const hls = React.useRef<Hls | null>(null);
     const dashjs = React.useRef<DashJS.MediaPlayerClass | null>(null);
     const { state, setState } = useVideoState();
+    const sourcesSignature = getSourcesSignature(sources);
     const playerRef = React.useCallback(
       (node) => {
         innerRef.current = node;
@@ -91,7 +101,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         currentQuality: sortedQualities[0],
       }));
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sources]);
+    }, [sourcesSignature]);
     const initPlayer = React.useCallback(
       async (source: Source) => {
         async function _initHlsPlayer() {
@@ -116,6 +126,26 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
             if (innerRef.current != null) {
               _hls.attachMedia(innerRef.current);
             }
+            const syncHlsQualities = () => {
+              const levels = getHlsQualityLabels(_hls.levels || []);
+              const qualities = levels.length ? ['auto', ...levels] : ['auto'];
+              const preferredQuality = preferQuality?.(levels);
+              setState((prev) => {
+                const nextQuality =
+                  (prev.currentQuality && qualities.includes(prev.currentQuality)
+                    ? prev.currentQuality
+                    : null) ||
+                  (preferredQuality && qualities.includes(preferredQuality)
+                    ? preferredQuality
+                    : null) ||
+                  'auto';
+                return {
+                  ...prev,
+                  qualities,
+                  currentQuality: nextQuality,
+                };
+              });
+            };
             onHlsInit?.(_hls, source);
             _hls.on(Hls.Events.MEDIA_ATTACHED, () => {
               _hls.loadSource(source.file);
@@ -130,25 +160,12 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
                     );
                 }
                 if (sources.length > 1) return;
-                const levels = getHlsQualityLabels(_hls.levels || []);
-                const qualities = ['auto', ...levels];
-                const preferredQuality = preferQuality?.(levels);
-                setState((prev) => {
-                  const nextQuality =
-                    (prev.currentQuality && qualities.includes(prev.currentQuality)
-                      ? prev.currentQuality
-                      : null) ||
-                    (preferredQuality && qualities.includes(preferredQuality)
-                      ? preferredQuality
-                      : null) ||
-                    'auto';
-                  return {
-                    ...prev,
-                    qualities,
-                    currentQuality: nextQuality,
-                  };
-                });
+                syncHlsQualities();
               });
+            });
+            _hls.on(Hls.Events.LEVELS_UPDATED, () => {
+              if (sources.length > 1) return;
+              syncHlsQualities();
             });
 
             //----REMOVED THIS SECTIONS SO M3U8 EMBEDDED SUBTITLES WONT OVERRIDE EXTERNAL SUBTITLES----
@@ -268,9 +285,11 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         onInit?.(innerRef.current);
         if (hls.current) {
           hls.current.destroy();
+          hls.current = null;
         }
         if (dashjs.current) {
           dashjs.current.reset();
+          dashjs.current = null;
         }
         if (shouldPlayHls(source)) {
           _initHlsPlayer();
@@ -285,7 +304,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         }
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [sources]
+      [autoPlay, changeSourceUrl, hlsConfig, onDashInit, onHlsInit, onInit, preferQuality, setState, sources, sourcesSignature]
     );
     React.useEffect(() => {
       const _hls = hls.current;
@@ -308,7 +327,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sources]);
+    }, [sourcesSignature]);
     React.useEffect(() => {
       const videoRef = innerRef.current;
       if (!videoRef) return;
