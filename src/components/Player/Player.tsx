@@ -35,25 +35,6 @@ const shouldPlayDash = (source: Source) =>
 
 const noop = () => {};
 
-const getHlsQualityLabels = (levels: Hls['levels']) =>
-  Array.from(
-    new Set(
-      levels
-        .sort((a, b) => b.height - a.height)
-        .filter((level) => level.height)
-        .map((level) => `${level.height}`)
-    )
-  );
-
-const getSourcesSignature = (sources: Source[]) =>
-  JSON.stringify(
-    sources.map((source) => ({
-      file: source.file,
-      label: source.label,
-      type: source.type,
-    }))
-  );
-
 const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
   (
     {
@@ -76,7 +57,6 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
     const hls = React.useRef<Hls | null>(null);
     const dashjs = React.useRef<DashJS.MediaPlayerClass | null>(null);
     const { state, setState } = useVideoState();
-    const sourcesSignature = getSourcesSignature(sources);
     const playerRef = React.useCallback(
       (node) => {
         innerRef.current = node;
@@ -93,15 +73,17 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         .filter((src) => !!src.label)
         .map((src) => src.label as string)
         .sort((a, b) => parseNumberFromString(b) - parseNumberFromString(a));
-      const notDuplicatedQualities: string[] = [
-        ...Array.from(new Set<string>(sortedQualities)),
-      ];
+
+      const notDuplicatedQualities = Array.from(new Set(sortedQualities));
+
       setState(() => ({
         qualities: notDuplicatedQualities,
-        currentQuality: sortedQualities[0],
+        currentQuality:
+          state.currentQuality && notDuplicatedQualities.includes(state.currentQuality)
+            ? state.currentQuality
+            : notDuplicatedQualities[0],
       }));
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sourcesSignature]);
+    }, [sources, state.currentQuality]);
     const initPlayer = React.useCallback(
       async (source: Source) => {
         async function _initHlsPlayer() {
@@ -126,29 +108,29 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
             if (innerRef.current != null) {
               _hls.attachMedia(innerRef.current);
             }
-            const syncHlsQualities = () => {
-              const levels = getHlsQualityLabels(_hls.levels || []);
-              const qualities = levels.length ? ['auto', ...levels] : ['auto'];
-              const preferredQuality = preferQuality?.(levels);
-              setState((prev) => {
-                const nextQuality =
-                  (prev.currentQuality && qualities.includes(prev.currentQuality)
-                    ? prev.currentQuality
-                    : null) ||
-                  (preferredQuality && qualities.includes(preferredQuality)
-                    ? preferredQuality
-                    : null) ||
-                  'auto';
-                return {
-                  ...prev,
-                  qualities,
-                  currentQuality: nextQuality,
-                };
-              });
-            };
             onHlsInit?.(_hls, source);
             _hls.on(Hls.Events.MEDIA_ATTACHED, () => {
               _hls.loadSource(source.file);
+              _hls.on(Hls.Events.LEVEL_LOADED, () => {
+                if (sources.length > 1) return;
+                if (!_hls.levels?.length) return;
+
+                const levels = Array.from(
+                  new Set(
+                    _hls.levels
+                      .filter((level) => level.height)
+                      .map((level) => String(level.height))
+                  )
+                ).sort(
+                  (a, b) =>
+                    parseNumberFromString(b) - parseNumberFromString(a)
+                );
+
+                setState((prev) => ({
+                  ...prev,
+                  qualities: ['auto', ...levels],
+                }));
+              });
               _hls.on(Hls.Events.MANIFEST_PARSED, () => {
                 if (autoPlay) {
                   innerRef?.current
@@ -159,13 +141,34 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
                       )
                     );
                 }
+
                 if (sources.length > 1) return;
-                syncHlsQualities();
+                if (!_hls.levels?.length) return;
+
+                const levels = Array.from(
+                  new Set(
+                    _hls.levels
+                      .filter((level) => level.height)
+                      .map((level) => String(level.height))
+                  )
+                ).sort(
+                  (a, b) =>
+                    parseNumberFromString(b) - parseNumberFromString(a)
+                );
+
+                const qualityOptions = ['auto', ...levels];
+
+                const selectedQuality =
+                  state.currentQuality &&
+                  qualityOptions.includes(state.currentQuality)
+                    ? state.currentQuality
+                    : 'auto';
+
+                setState(() => ({
+                  qualities: qualityOptions,
+                  currentQuality: selectedQuality,
+                }));
               });
-            });
-            _hls.on(Hls.Events.LEVELS_UPDATED, () => {
-              if (sources.length > 1) return;
-              syncHlsQualities();
             });
 
             //----REMOVED THIS SECTIONS SO M3U8 EMBEDDED SUBTITLES WONT OVERRIDE EXTERNAL SUBTITLES----
@@ -255,7 +258,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
           }
           innerRef.current.addEventListener('loadeddata', () => {
             const bitrates = player.getBitrateInfoListFor('video');
-            const qualities = bitrates.map((birate) => birate.height.toString());
+            const qualities = bitrates.map((birate) => birate.height + 'p');
             const bestQuality = (() => {
               const quality = bitrates.find((bitrate) => {
                 const quality =
@@ -285,11 +288,9 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         onInit?.(innerRef.current);
         if (hls.current) {
           hls.current.destroy();
-          hls.current = null;
         }
         if (dashjs.current) {
           dashjs.current.reset();
-          dashjs.current = null;
         }
         if (shouldPlayHls(source)) {
           _initHlsPlayer();
@@ -304,7 +305,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         }
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [autoPlay, changeSourceUrl, hlsConfig, onDashInit, onHlsInit, onInit, preferQuality, setState, sources, sourcesSignature]
+      [sources]
     );
     React.useEffect(() => {
       const _hls = hls.current;
@@ -327,7 +328,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sourcesSignature]);
+    }, [sources]);
     React.useEffect(() => {
       const videoRef = innerRef.current;
       if (!videoRef) return;
@@ -337,20 +338,23 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         sources.find((source) => source.label === currentQuality) || sources[0];
       // If the sources contain only one m3u8 url, then it maybe is a playlist.
       if (shouldPlayHls(source) && sources.length === 1) {
-        // Check if the playlist gave us qualities.
         if (!hls?.current?.levels?.length) return;
         if (!currentQuality) return;
+
+        // Auto quality
         if (currentQuality === 'auto') {
           hls.current.currentLevel = -1;
           return;
         }
-        // Handle changing quality.
-        const index = hls.current.levels.findIndex(
+
+        const levelIndex = hls.current.levels.findIndex(
           (level) =>
-            level.height === parseNumberFromString(state.currentQuality!)
+            level.height === parseNumberFromString(currentQuality)
         );
-        if (index === -1) return;
-        hls.current.currentLevel = index;
+
+        if (levelIndex === -1) return;
+
+        hls.current.currentLevel = levelIndex;
         return;
       }
       if (shouldPlayDash(source) && sources.length === 1) {
