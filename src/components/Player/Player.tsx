@@ -4,7 +4,6 @@ import { Source } from '../../types';
 import { parseNumberFromString } from '../../utils';
 import styles from './Player.module.css';
 import Hls from 'hls.js';
-import DashJS from '../../types/dashjs';
 import loadScript from '../../utils/load-script';
 
 const HLS_SCRIPT_URL =
@@ -56,6 +55,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
     const innerRef = React.useRef<HTMLVideoElement>();
     const hls = React.useRef<Hls | null>(null);
     const dashjs = React.useRef<DashJS.MediaPlayerClass | null>(null);
+    const dashReady = React.useRef<boolean>(false);
     const { state, setState } = useVideoState();
     const playerRef = React.useCallback(
       (node) => {
@@ -73,24 +73,25 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         .filter((src) => !!src.label)
         .map((src) => src.label as string)
         .sort((a, b) => parseNumberFromString(b) - parseNumberFromString(a));
-
-      const notDuplicatedQualities = Array.from(new Set(sortedQualities));
-
+      const notDuplicatedQualities: string[] = [
+        ...Array.from(new Set<string>(sortedQualities)),
+      ];
       setState(() => ({
         qualities: notDuplicatedQualities,
-        currentQuality:
-          state.currentQuality && notDuplicatedQualities.includes(state.currentQuality)
-            ? state.currentQuality
-            : notDuplicatedQualities[0],
+        currentQuality: sortedQualities[0],
       }));
-    }, [sources, state.currentQuality]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sources]);
     const initPlayer = React.useCallback(
       async (source: Source) => {
         async function _initHlsPlayer() {
+          const videoEl = innerRef.current;
+          if (!videoEl) return;
           const HlsSDK = await loadScript<typeof Hls>(
             HLS_SCRIPT_URL,
             HLS_VARIABLE_NAME
           );
+          if (!videoEl.isConnected) return;
           if (HlsSDK.isSupported()) {
             const _hls: Hls = new HlsSDK({
               xhrSetup: (xhr, url) => {
@@ -105,68 +106,37 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
               hlsRef.current = _hls;
             }
             hls.current = _hls;
-            if (innerRef.current != null) {
-              _hls.attachMedia(innerRef.current);
-            }
+            _hls.attachMedia(videoEl);
             onHlsInit?.(_hls, source);
             _hls.on(Hls.Events.MEDIA_ATTACHED, () => {
               _hls.loadSource(source.file);
-              _hls.on(Hls.Events.LEVEL_LOADED, () => {
-                if (sources.length > 1) return;
-                if (!_hls.levels?.length) return;
-
-                const levels = Array.from(
-                  new Set(
-                    _hls.levels
-                      .filter((level) => level.height)
-                      .map((level) => String(level.height))
-                  )
-                ).sort(
-                  (a, b) =>
-                    parseNumberFromString(b) - parseNumberFromString(a)
-                );
-
-                setState((prev) => ({
-                  ...prev,
-                  qualities: ['auto', ...levels],
-                }));
-              });
               _hls.on(Hls.Events.MANIFEST_PARSED, () => {
                 if (autoPlay) {
-                  innerRef?.current
-                    ?.play()
+                  videoEl
+                    .play()
                     .catch(() =>
                       console.error(
                         'User must interact before playing the video.'
                       )
                     );
                 }
-
                 if (sources.length > 1) return;
+                if (source.label) {
+                  setState((prev) => ({
+                    qualities: [source.label!],
+                    currentQuality: prev?.currentQuality || source.label!,
+                  }));
+                  return;
+                }
                 if (!_hls.levels?.length) return;
-
-                const levels = Array.from(
-                  new Set(
-                    _hls.levels
-                      .filter((level) => level.height)
-                      .map((level) => String(level.height))
-                  )
-                ).sort(
-                  (a, b) =>
-                    parseNumberFromString(b) - parseNumberFromString(a)
-                );
-
-                const qualityOptions = ['auto', ...levels];
-
-                const selectedQuality =
-                  state.currentQuality &&
-                  qualityOptions.includes(state.currentQuality)
-                    ? state.currentQuality
-                    : 'auto';
-
+                const levels: string[] = _hls.levels
+                  .sort((a, b) => b.height - a.height)
+                  .filter((level) => level.height)
+                  .map((level) => `${level.height}`);
+                const level = preferQuality?.(levels) || levels[0];
                 setState(() => ({
-                  qualities: qualityOptions,
-                  currentQuality: selectedQuality,
+                  qualities: levels,
+                  currentQuality: level,
                 }));
               });
             });
@@ -240,76 +210,126 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
               }
             });
           } else if (
-            innerRef.current?.canPlayType('application/vnd.apple.mpegurl')
+            videoEl.canPlayType('application/vnd.apple.mpegurl')
           ) {
-            innerRef.current.src = source.file;
+            videoEl.src = source.file;
           }
         }
         async function _initDashPlayer() {
-          if (!innerRef.current) return;
+          const videoEl = innerRef.current;
+          if (!videoEl) return;
           const DashSDK = await loadScript<typeof DashJS>(
             DASH_SCRIPT_URL,
             DASH_VARIABLE_NAME
           );
+          if (!videoEl.isConnected) return;
+          dashReady.current = false;
           const player = DashSDK.MediaPlayer().create();
           dashjs.current = player;
           if (dashRef) {
             dashRef.current = player;
           }
-          innerRef.current.addEventListener('loadeddata', () => {
-            const bitrates = player.getBitrateInfoListFor('video');
-            const qualities = bitrates.map((birate) => birate.height + 'p');
-            const bestQuality = (() => {
-              const quality = bitrates.find((bitrate) => {
-                const quality =
-                  state.currentQuality || preferQuality?.(qualities);
-                if (!quality) return false;
-                return bitrate.height === parseNumberFromString(quality);
-              });
-              if (quality) return quality;
-              return bitrates[bitrates.length - 1];
-            })();
-            player.setQualityFor('video', bestQuality.qualityIndex);
-            setState(() => ({
-              qualities,
-              currentQuality: state?.currentQuality || bestQuality.height + 'p',
-            }));
-          });
+          const useSourceLabel = !!source.label && sources.length === 1;
+          const handleStreamInitialized = () => {
+            try {
+              if (!player || dashjs.current !== player) return;
+              const bitrates = player.getBitrateInfoListFor('video');
+              if (!bitrates?.length) return;
+              dashReady.current = true;
+              if (sources.length > 1) {
+                return;
+              }
+              if (useSourceLabel) {
+                setState((prev) => ({
+                  qualities: [source.label!],
+                  currentQuality: prev?.currentQuality || source.label!,
+                }));
+              } else {
+                const qualities = bitrates.map(
+                  (bitrate) => bitrate.height.toString()
+                );
+                const bestQuality = (() => {
+                  const quality = bitrates.find((bitrate) => {
+                    const q =
+                      state.currentQuality || preferQuality?.(qualities);
+                    if (!q) return false;
+                    return bitrate.height === parseNumberFromString(q);
+                  });
+                  if (quality) return quality;
+                  return bitrates[bitrates.length - 1];
+                })();
+                if (
+                  bestQuality &&
+                  (bestQuality.qualityIndex === 0 || bestQuality.qualityIndex)
+                ) {
+                  try {
+                    player.setQualityFor('video', bestQuality.qualityIndex);
+                  } catch (err) {
+                    console.warn('Dash setQualityFor failed:', err);
+                  }
+                }
+                setState((prev) => ({
+                  qualities,
+                  currentQuality:
+                    prev?.currentQuality ||
+                    bestQuality?.height?.toString() ||
+                    qualities[0],
+                }));
+              }
+            } catch (err) {
+              console.warn('Dash stream init handler failed:', err);
+            }
+          };
+          player.on(
+            'streamInitialized',
+            handleStreamInitialized
+          );
           player.updateSettings({
-            streaming: { abr: { autoSwitchBitrate: { video: false } } },
+            streaming: { abr: { autoSwitchBitrate: { video: useSourceLabel } } },
           });
           player.initialize();
           player.setAutoPlay(autoPlay || false);
-          player.attachView(innerRef.current);
+          player.attachView(videoEl);
           player.attachSource(source.file);
           onDashInit?.(player, source);
         }
-        if (!innerRef.current) return;
-        onInit?.(innerRef.current);
+        const videoEl = innerRef.current;
+        if (!videoEl) return;
+        onInit?.(videoEl);
         if (hls.current) {
-          hls.current.destroy();
+          try {
+            hls.current.destroy();
+          } catch (err) {
+            console.warn('Hls destroy failed:', err);
+          }
+          hls.current = null;
         }
         if (dashjs.current) {
-          dashjs.current.reset();
+          try {
+            dashjs.current.reset();
+          } catch (err) {
+            console.warn('Dash reset failed:', err);
+          }
+          dashjs.current = null;
         }
+        dashReady.current = false;
         if (shouldPlayHls(source)) {
           _initHlsPlayer();
         } else if (shouldPlayDash(source)) {
           _initDashPlayer();
         } else {
-          if (innerRef.current.src) {
-            innerRef.current.pause();
+          if (videoEl.src) {
+            videoEl.pause();
           }
-          innerRef.current.src = source.file;
-          innerRef.current.load();
+          videoEl.src = source.file;
+          videoEl.load();
         }
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
       [sources]
     );
     React.useEffect(() => {
-      const _hls = hls.current;
-      const _dash = dashjs.current;
+      const cancelled = { current: false };
       const source =
         sources.find((source) => source.label === state?.currentQuality) ||
         sources[0];
@@ -320,12 +340,24 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         initQuality();
       }
       return () => {
-        if (_hls) {
-          _hls.destroy();
+        cancelled.current = true;
+        if (hls.current) {
+          try {
+            hls.current.destroy();
+          } catch (err) {
+            console.warn('Hls destroy failed:', err);
+          }
+          hls.current = null;
         }
-        if (_dash) {
-          _dash.reset();
+        if (dashjs.current) {
+          try {
+            dashjs.current.reset();
+          } catch (err) {
+            console.warn('Dash reset failed:', err);
+          }
+          dashjs.current = null;
         }
+        dashReady.current = false;
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sources]);
@@ -338,28 +370,28 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         sources.find((source) => source.label === currentQuality) || sources[0];
       // If the sources contain only one m3u8 url, then it maybe is a playlist.
       if (shouldPlayHls(source) && sources.length === 1) {
+        // Check if the playlist gave us qualities.
         if (!hls?.current?.levels?.length) return;
         if (!currentQuality) return;
-
-        // Auto quality
-        if (currentQuality === 'auto') {
-          hls.current.currentLevel = -1;
-          return;
-        }
-
-        const levelIndex = hls.current.levels.findIndex(
+        // Handle changing quality.
+        const index = hls.current.levels.findIndex(
           (level) =>
-            level.height === parseNumberFromString(currentQuality)
+            level.height === parseNumberFromString(state.currentQuality!)
         );
-
-        if (levelIndex === -1) return;
-
-        hls.current.currentLevel = levelIndex;
+        if (index === -1) return;
+        hls.current.currentLevel = index;
         return;
       }
       if (shouldPlayDash(source) && sources.length === 1) {
         if (!dashjs.current) return;
-        const bitrates = dashjs.current.getBitrateInfoListFor('video');
+        if (!dashReady.current) return;
+        let bitrates: DashJS.BitrateInfo[] = [];
+        try {
+          bitrates = dashjs.current.getBitrateInfoListFor('video');
+        } catch (err) {
+          console.warn('Dash getBitrateInfoListFor failed:', err);
+          return;
+        }
         // Check if the playlist gave us qualities.
         if (!bitrates?.length) return;
         if (!currentQuality) return;
@@ -371,7 +403,11 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
           return;
         }
         // Handle changing quality.
-        dashjs.current.setQualityFor('video', choseBitrate.qualityIndex);
+        try {
+          dashjs.current.setQualityFor('video', choseBitrate.qualityIndex);
+        } catch (err) {
+          console.warn('Dash setQualityFor failed:', err);
+        }
         return;
       }
       const beforeChangeTime = videoRef.currentTime;

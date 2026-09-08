@@ -147,6 +147,7 @@ const defaultI18n: I18n = {
     hideTranscript: 'Hide Transcript',
     transcriptTip: 'Tip: Pause the video at the beginning of a character line and click on the specific subtitle for a better sync',
     subtitleInfo: 'you can customize and sync subtitles on the Personalization tab',
+    qualityInfo: 'forcing quality selection can affect audio tracks',
   },
 };
 

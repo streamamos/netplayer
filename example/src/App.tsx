@@ -1,152 +1,388 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import NetPlayer from '../../src'
 
+// ---------------------------------------------------------------------------
+// Source presets — pick whichever config you want to test against NetPlayer.
+// ---------------------------------------------------------------------------
+type SourceMode = 'hls-multi' | 'hls-auto' | 'dash' | 'broken'
+
+interface SourceItem {
+  file: string
+  label: string
+}
+
+interface SourcePreset {
+  title: string
+  description: string
+  sources: SourceItem[]
+}
+
+const SOURCE_PRESETS: Record<SourceMode, SourcePreset> = {
+  'hls-multi': {
+    title: 'HLS — Multiple Qualities',
+    description: 'Master playlist + explicit renditions, so you can test manual quality switching.',
+    sources: [
+      { file: 'https://cdn.bitmovin.com/content/assets/sintel/hls/playlist.m3u8', label: 'auto' },
+      { file: 'https://cdn.bitmovin.com/content/assets/sintel/hls/video/10000kbit.m3u8', label: '1744' },
+      { file: 'https://cdn.bitmovin.com/content/assets/sintel/hls/video/6000kbit.m3u8', label: '818' },
+      { file: 'https://cdn.bitmovin.com/content/assets/sintel/hls/video/250kbit.m3u8', label: '180' },
+    ],
+  },
+  'hls-auto': {
+    title: 'HLS — Auto Only',
+    description: 'Single master playlist, letting ABR handle quality selection with no manual renditions.',
+    sources: [
+      { file: 'https://cdn.bitmovin.com/content/assets/sintel/hls/playlist.m3u8', label: 'auto' },
+    ],
+  },
+  dash: {
+    title: 'DASH',
+    description: 'MPEG-DASH manifest (Bitmovin public demo asset), for testing the DASH code path.',
+    sources: [
+      {
+        file: 'https://cdn.bitmovin.com/content/assets/art-of-motion-dash-hls-progressive/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd',
+        label: 'auto',
+      },
+    ],
+  },
+  broken: {
+    title: 'Broken Source',
+    description: 'Deliberately invalid manifest URL, to test the player error/retry UI.',
+    sources: [
+      { file: 'https://invalid.example.com/does-not-exist/playlist.m3u8', label: 'auto' },
+    ],
+  },
+}
+
+const MODE_ORDER: SourceMode[] = ['hls-multi', 'hls-auto', 'dash', 'broken']
+
+// ---------------------------------------------------------------------------
+// Sample subtitle tracks — loaded manually via the "Load subtitles" button,
+// so you can test injecting subtitles mid-playback rather than on a fixed timer.
+// ---------------------------------------------------------------------------
+const SAMPLE_SUBTITLES = [
+  {
+    lang: '(PT v2) TWD1X1',
+    language: '(PT v2) TWD1X1',
+    file: 'https://dl.opensubtitles.org/en/download/src-api/vrf-19cf0c5b/file/1961764907.srt',
+  },
+  {
+    lang: '(PT v0) asd',
+    language: '(PT v0) asd',
+    file: 'https://sub.wyzie.ru/c/19e10c61/id/1952597846?format=srt&encoding=CP1252',
+  },
+  {
+    lang: '(PT v2) 3441',
+    language: '(PT v2) 3441',
+    file: 'https://cca.megafiles.store/03/57/0357b2f774963019a8ea1e7689acb7e5/por-17.vtt',
+  },
+  {
+    lang: '(PT v2) sss',
+    language: '(PT v2) sss',
+    file: 'https://dl.opensubtitles.org/en/download/src-api/vrf-19d50c5c/file/1961588454.ass',
+  },
+  {
+    lang: '(EN v2) TWD1X1',
+    language: '(EN v2) TWD1X1',
+    file: 'https://sub.wyzie.ru/c/19b00c55/id/1961741348?format=srt&encoding=UTF-8',
+  },
+  {
+    lang: '(PT BR v2) asdasd',
+    language: '(PT BR v2) asdasd',
+    file: 'https://sub.wyzie.ru/c/19a50c51/id/1952608045?format=srt&encoding=CP1252',
+  },
+  {
+    lang: '(PT BR v2) ERROR',
+    language: '(PT BR v2) ERROR',
+    file: 'https://dl.opensubtitles.org/en/download/subencoding-utf8/src-api/vrf-19d50c5e/file/1961827955.ass',
+  },
+  {
+    lang: '(PT BR v2) error on sub',
+    language: '(PT BR v2) error on sub',
+    file: 'https://dl.opensubtitles.org/en/download/subencoding-utf8/src-api/vrf-19d80c58/file/19568ssds32841.srt',
+  },
+  {
+    lang: '(PT BR v2) err not found',
+    language: '(PT BR v2) err not found',
+    // intentionally malformed host, to exercise the "subtitle failed to load" path
+    file: 'https://dl.opensubtsitles.org/en/download/subencoding-utf8/src-api/vrf-19d80c58/file/19568ssds32841.srt',
+  },
+  {
+    lang: 'Portuguese (Sem Fonte)',
+    language: 'Portuguese (Sem Fonte)',
+    file: 'https://gist.githubusercontent.com/streamamos/239d3cb55bf6b3535dd11fba14b26178/raw/noSource.srt',
+  },
+]
+
+const SKIP_SEGMENTS = {
+  intro: { start_ms: null, end_ms: 10000, confidence: 0.25, submission_count: 1 },
+  recap: { start_ms: null, end_ms: null, confidence: 0.25, submission_count: 1 },
+  credits: { start_ms: 100000, end_ms: null, confidence: 0.25, submission_count: 1 },
+}
+
+// ---------------------------------------------------------------------------
+// URL <-> mode persistence, so a link like ?mode=dash opens straight into
+// that test case.
+// ---------------------------------------------------------------------------
+function readModeFromUrl(): SourceMode {
+  if (typeof window === 'undefined') return 'hls-multi'
+  const param = new URLSearchParams(window.location.search).get('mode')
+  return (MODE_ORDER as string[]).includes(param || '') ? (param as SourceMode) : 'hls-multi'
+}
+
+function writeModeToUrl(mode: SourceMode) {
+  if (typeof window === 'undefined') return
+  const url = new URL(window.location.href)
+  url.searchParams.set('mode', mode)
+  window.history.replaceState({}, '', url.toString())
+}
+
+// ---------------------------------------------------------------------------
+// Debug overlay — tracks basic player status via NetPlayer callback props.
+// NOTE: adjust the prop/callback names below (onReady, onPlay, onPause,
+// onBuffer, onError, onQualityChange) to match NetPlayer's actual event API
+// if these aren't the real prop names — swap them for whatever it exposes.
+// ---------------------------------------------------------------------------
+type PlayerStatus = 'loading' | 'ready' | 'playing' | 'paused' | 'buffering' | 'error'
+
+interface DebugState {
+  status: PlayerStatus
+  quality?: string
+  errorMessage?: string
+}
+
+const STATUS_COLORS: Record<PlayerStatus, string> = {
+  loading: '#f5a623',
+  ready: '#4caf7d',
+  playing: '#4caf7d',
+  paused: '#9a9aa2',
+  buffering: '#f5a623',
+  error: '#e5484d',
+}
+
+const DebugOverlay: React.FC<{ state: DebugState }> = ({ state }) => (
+  <div
+    style={{
+      position: 'absolute',
+      top: 12,
+      left: 12,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+      padding: '6px 12px',
+      borderRadius: 8,
+      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      backdropFilter: 'blur(4px)',
+      fontSize: 12,
+      color: '#f2f2f2',
+      zIndex: 10,
+      pointerEvents: 'none',
+    }}
+  >
+    <span
+      style={{
+        width: 8,
+        height: 8,
+        borderRadius: '50%',
+        backgroundColor: STATUS_COLORS[state.status],
+        flexShrink: 0,
+      }}
+    />
+    <span style={{ textTransform: 'capitalize' }}>{state.status}</span>
+    {state.quality && <span style={{ color: '#9a9aa2' }}>· {state.quality}</span>}
+    {state.errorMessage && <span style={{ color: '#e5484d' }}>· {state.errorMessage}</span>}
+  </div>
+)
+
+// ---------------------------------------------------------------------------
+// Source switcher control bar
+// ---------------------------------------------------------------------------
+const SourceSwitcher: React.FC<{
+  mode: SourceMode
+  onChange: (mode: SourceMode) => void
+  autoPlay: boolean
+  onAutoPlayChange: (value: boolean) => void
+  onLoadSubtitles: () => void
+  subtitlesLoaded: boolean
+}> = ({ mode, onChange, autoPlay, onAutoPlayChange, onLoadSubtitles, subtitlesLoaded }) => (
+  <div
+    style={{
+      display: 'flex',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+      gap: '12px',
+      padding: '16px 24px',
+      borderBottom: '1px solid #232326',
+      backgroundColor: '#141416',
+    }}
+  >
+    <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: 0.4, color: '#9a9aa2', textTransform: 'uppercase' }}>
+      Source
+    </span>
+
+    <div style={{ display: 'flex', gap: 8 }}>
+      {MODE_ORDER.map((m) => {
+        const active = m === mode
+        return (
+          <button
+            key={m}
+            onClick={() => onChange(m)}
+            style={{
+              padding: '8px 16px',
+              borderRadius: 999,
+              border: active ? '1px solid #6d5efc' : '1px solid #2b2b30',
+              backgroundColor: active ? '#6d5efc' : 'transparent',
+              color: active ? '#ffffff' : '#c7c7cf',
+              fontSize: 14,
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 120ms ease',
+            }}
+          >
+            {SOURCE_PRESETS[m].title}
+          </button>
+        )
+      })}
+    </div>
+
+    <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginLeft: 8 }}>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#c7c7cf', cursor: 'pointer' }}>
+        <input type="checkbox" checked={autoPlay} onChange={(e) => onAutoPlayChange(e.target.checked)} />
+        Autoplay
+      </label>
+
+      <button
+        onClick={onLoadSubtitles}
+        disabled={subtitlesLoaded}
+        style={{
+          padding: '6px 14px',
+          borderRadius: 8,
+          border: '1px solid #2b2b30',
+          backgroundColor: subtitlesLoaded ? '#1c1c1f' : 'transparent',
+          color: subtitlesLoaded ? '#5c5c63' : '#c7c7cf',
+          fontSize: 13,
+          cursor: subtitlesLoaded ? 'default' : 'pointer',
+        }}
+      >
+        {subtitlesLoaded ? 'Subtitles loaded' : 'Load subtitles'}
+      </button>
+    </div>
+
+    <span style={{ marginLeft: 'auto', fontSize: 13, color: '#7a7a82', maxWidth: 380, textAlign: 'right' }}>
+      {SOURCE_PRESETS[mode].description}
+    </span>
+  </div>
+)
+
+// ---------------------------------------------------------------------------
+// App
+// ---------------------------------------------------------------------------
 const App: React.FC = () => {
+  const [mode, setMode] = useState<SourceMode>(() => readModeFromUrl())
+  const [autoPlay, setAutoPlay] = useState(true)
   const [subtitles, setSubtitles] = useState<any[]>([])
+  const [debugState, setDebugState] = useState<DebugState>({ status: 'loading' })
+  const [showSkeleton, setShowSkeleton] = useState(true)
 
+  const preset = useMemo(() => SOURCE_PRESETS[mode], [mode])
+
+  const handleModeChange = useCallback((next: SourceMode) => {
+    setMode(next)
+    writeModeToUrl(next)
+    setSubtitles([])
+    setDebugState({ status: 'loading' })
+    setShowSkeleton(true)
+  }, [])
+
+  // Fallback: clear the loading skeleton shortly after mount in case
+  // NetPlayer doesn't fire an onReady-style callback.
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setSubtitles([
-        {
-          lang: "(PT v2) TWD1X1",
-          language: "(PT v2) TWD1X1",
-          file: "https://dl.opensubtitles.org/en/download/src-api/vrf-19cf0c5b/file/1961764907.srt",
-        },
-        {
-          lang: "(PT v0) asd",
-          language: "(PT v0) asd",
-          file: "https://sub.wyzie.ru/c/19e10c61/id/1952597846?format=srt&encoding=CP1252",
-        },
-        {
-          lang: "(PT v2) 3441",
-          language: "(PT v2) 3441",
-          file: "https://cca.megafiles.store/03/57/0357b2f774963019a8ea1e7689acb7e5/por-17.vtt",
-        },
-        {
-          lang: "(PT v2) sss",
-          language: "(PT v2) sss",
-          file: "https://dl.opensubtitles.org/en/download/src-api/vrf-19d50c5c/file/1961588454.ass",
-        },
-        {
-          lang: "(EN v2) TWD1X1",
-          language: "(EN v2) TWD1X1",
-          file: "https://sub.wyzie.ru/c/19b00c55/id/1961741348?format=srt&encoding=UTF-8",
-        },
-        {
-          lang: "(PT BR v2) asdasd",
-          language: "(PT BR v2) asdasd",
-          file: "https://sub.wyzie.ru/c/19a50c51/id/1952608045?format=srt&encoding=CP1252",
-        },
-        {
-          lang: "(PT BR v2) ERROR",
-          language: "(PT BR v2) ERROR",
-          file: "https://dl.opensubtitles.org/en/download/subencoding-utf8/src-api/vrf-19d50c5e/file/1961827955.ass",
-        },
-        {
-          lang: "(PT BR v2) error on sub",
-          language: "(PT BR v2) error on sub",
-          file: "https://dl.opensubtitles.org/en/download/subencoding-utf8/src-api/vrf-19d80c58/file/19568ssds32841.srt",
-        },
-        {
-          lang: "(PT BR v2) err not found",
-          language: "(PT BR v2) err not found",
-          file: "https://dl.opensubtsitles.org/en/download/subencoding-utf8/src-api/vrf-19d80c58/file/19568ssds32841.srt",
-        },
-        {
-          lang: "Portuguese (Sem Fonte)",
-          language: "Portuguese (Sem Fonte)",
-          file: "https://gist.githubusercontent.com/streamamos/239d3cb55bf6b3535dd11fba14b26178/raw/noSource.srt",
-        },
-      ])
-    }, 5000) // 5 seconds delay
+    const t = setTimeout(() => setShowSkeleton(false), 600)
+    return () => clearTimeout(t)
+  }, [mode])
 
-    // Cleanup function to clear the timeout if component unmounts
-    return () => clearTimeout(timer)
+  const handleLoadSubtitles = useCallback(() => {
+    setSubtitles(SAMPLE_SUBTITLES)
+  }, [])
+
+  // --- NetPlayer callback wiring -------------------------------------------
+  // Adjust these to whatever event props NetPlayer actually exposes.
+  const handlePlay = useCallback(() => setDebugState((s) => ({ ...s, status: 'playing' })), [])
+  const handlePause = useCallback(() => setDebugState((s) => ({ ...s, status: 'paused' })), [])
+  const handleError = useCallback((err: any) => {
+    setShowSkeleton(false)
+    setDebugState({ status: 'error', errorMessage: err?.message || 'Failed to load source' })
   }, [])
 
   return (
-    <div style={{ padding: '100px', backgroundColor: 'black', width: '100%', height: '100%' }}>
-    <NetPlayer
-      sources={[
-        // {
-        //   file: `https://small-cake-fdee.piracya.workers.dev/m3u8-proxy?url=https%3A%2F%2Fvixsrc.to%2Fplaylist%2F173365%3Fb%3D1%26token%3D7a5ed11898460bbdaba04d5ccb3b4926%26expires%3D1772674011%26h%3D1%26lang%3Den&headers=%7B%22Referer%22%3A%22https%3A%2F%2Fvixsrc.to%2Ftv%2F1399%2F1%2F1%22%2C%22User-Agent%22%3A%22Mozilla%2F5.0%20(Macintosh%3B%20Intel%20Mac%20OS%20X%2010_15_7)%20AppleWebKit%2F537.36%22%7D`,
-        //   label: 'auto'
-        // },
-        // {
-        //   file: `https://zef.magnificentthunderstormkaleidoscope.online/proxy/m3u8/https%3A%2F%2Fp.10020.workers.dev%2Fs%2Fafc7d47f%2Fma9yIsUHLd1oEUKmveBRD7YAa6TtBq8pQ3HlTrfwAmaCVWKODqhjdHV_akF-4XHWSYkxv7g5M65u0rl9tQPgWeM0gEd0nnwS9MDPbpIaPg99jm5AmmxzBZIeJx5B8UV6DnJjteoQ6vaA4M5ys_iDjXQ9l6UWSS95PuM7APbpf0O17HcpCIkHx6wtHwjgxL7awPpg-bttsWpV1ol7q9ryIy2jFpi83R3xBxluvtXouvFn-cQu2u3GQ34OOJhwkLiq7Q1bwv2s4CgdkfzHHlq1hKXYiHD9iiDW-_3Z8tmiMeo.m3u8/%7B%22referer%22%3A%22https%3A%2F%2Fhexa.su%2F%22%7D`,
-        //   label: 'auto'
-        // },
-        //  {
-        //    file: `https://cdn.bitmovin.com/content/assets/sintel/hls/playlist.m3u8`,
-        //    label: 'auto'
-        //  },
-           {
-            file: `https://cdn.bitmovin.com/content/assets/sintel/hls/playlist.m3u8`,
-            label: 'auto'
-        },
-          //  {
-          //   file: `https://cdn.bitmovin.com/content/assets/sintel/hls/playlist.m3u8`,
-          //   label: 'auto'
-          // },
-          //  {
-          //   file: `https://zef.magnificentthunderstormkaleidoscope.online/proxy/m3u8/https%3A%2F%2Fp.10020.workers.dev%2Fs%2Fafc7d47f%2Fma9yIsUHLd1oEUKmveBRD7YAa6TtBq8pQ3HlTrfwAmaCVWKODqhjdHV_akF-4XHWIKt7bx_NpowA2x84WtRtg5Jk6PfF4_xrX9fRG6y7npnah0lJw7PExA0MaBy6JFKoO2UGqU03hO90yD_Xf7iOC6e-VYvo_GkSSyNBGvqVYdvAYH3LoDSmPi4MMS8QLnGmgNne7q3n4PJhqhREeDbiSWDpt_4t9Vtr-OgHYAr8WpefI1EcugBM-mLn9T4gfZC53qlJy25CmL3hXdnhrfMMfdLbPLA3pjj94uasquAj9hI.m3u8/%7B%22referer%22%3A%22https%3A%2F%2Fhexa.su%2F%22%7D`,
-          //   label: '1080'
-          // },
-          
-        //   {
-        //    file: `https://i-arch-400.fikka407bis.com/stream2/i-arch-400/db40f8c9470f0af1174ffbff030cc805/MJTMsp1RshGTygnMNRUR2N2MSlnWXZEdMNDZzQWe5MDZzMmdZJTO1R2RWVHZDljekhkSsl1VwYnWtx2cihVT21EVCpWWU5kaNR0Yzo1RZRTTqtGePRVT31kMRVjWHl0MPRVS61keG1mTEVUP:1773262617:94.61.244.111:73c543a819deb863bb0139ee21a420f70a75571d94b22bc52d71e3c2a35f4b12:=8EVRVnTqVUdNpWUwwkaFhXTR1TP/index.m3u8`,
-        //    label: 'auto'
-        //  },
-        //         {
-        //   file: `https://zef.magnificentthunderstormkaleidoscope.online/proxy/m3u8/https%3A%2F%2Fp.10020.workers.dev%2Fs%2Fafc7d47f%2Fma9yIsUHLd1oEUKmveBRD7YAa6TtBq8pQ3HlTrfwAmaCVWKODqhjdHV_akF-4XHWcRocgwz6yRQ1iFcUQQz7YiTtGlkZ3FLsduH5KbMLpc8YwNcjzKDVF87GacqO_xvWZkoE4KsxACK_ABoNmguw3U3NT5DpY_HqTUW0JrvfD2YPj_3S2_AnRDm1NLQe3gzUnnHlWKr1tO8wcG6yYO3epfo_rmpqA8Jg6hl74uah9RRxS16eHDErh81zC3HrqubSvZLgkOo8FImz6aM7p49BcYPCKFDqMqejMdGgp8m9cjg.m3u8/%7B%22referer%22%3A%22https%3A%2F%2Fhexa.su%2F%22%7D`,
-        //   label: 'auto'
-        // },
-        //  {
-        //    file: `https://test-streams.mux.dev/x36xhzz/url_8/193039199_mp4_h264_aac_fhd_7.m3u8`,
-        //    label: '1080'
-        //  },
-        // {
-        //   file: `https://test-streams.mux.dev/x36xhzz/url_0/193039199_mp4_h264_aac_hd_7.m3u8`,
-        //   label: '720'
-        // },
-        // {
-        //   file: `https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8`,
-        //   label: '480'
-        // },
-        // {
-        //   file: `https://test-streams.mux.dev/x36xhzz/url_4/193039199_mp4_h264_aac_7.m3u8`,
-        //   label: '288'
-        // },
-        // {
-        //   file: `https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8`,
-        //   label: '184'
-        // },
-      ]}
-      subtitles={subtitles}
-      skipsegments={{
-        intro: {
-          start_ms: null,
-          end_ms: 10000,
-          "confidence": 0.25,
-          "submission_count": 1
-        },
-        recap: {
-          start_ms: null,
-          end_ms: null,
-          "confidence": 0.25,
-          "submission_count": 1
-        },
-        credits: {
-          start_ms: 100000,
-          end_ms: null,
-          "confidence": 0.25,
-          "submission_count": 1
-        },
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        height: '100%',
+        minHeight: '100vh',
+        backgroundColor: '#0b0b0d',
+        color: '#f2f2f2',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       }}
-      className="object-contain w-full h-full"
-      thumbnail="https://preview.zorores.com/8b/8bc17ab9537166f2abb7e0bef2b57e23/thumbnails/sprite.vtt"
-      autoPlay
-    />
+    >
+      <SourceSwitcher
+        mode={mode}
+        onChange={handleModeChange}
+        autoPlay={autoPlay}
+        onAutoPlayChange={setAutoPlay}
+        onLoadSubtitles={handleLoadSubtitles}
+        subtitlesLoaded={subtitles.length > 0}
+      />
+
+      <div style={{ flex: 1, padding: '32px', display: 'flex' }}>
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            aspectRatio: '16 / 9',
+            margin: 'auto',
+            borderRadius: 12,
+            overflow: 'hidden',
+            backgroundColor: '#000',
+          }}
+        >
+          <DebugOverlay state={debugState} />
+
+          {showSkeleton && (
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#0b0b0d',
+                color: '#5c5c63',
+                fontSize: 14,
+                zIndex: 5,
+              }}
+            >
+              Loading player…
+            </div>
+          )}
+
+          <NetPlayer
+            // remount the player whenever the source preset changes
+            key={mode}
+            sources={preset.sources}
+            subtitles={subtitles}
+            skipsegments={SKIP_SEGMENTS}
+            className="object-contain w-full h-full"
+            thumbnail="https://preview.zorores.com/8b/8bc17ab9537166f2abb7e0bef2b57e23/thumbnails/sprite.vtt"
+            autoPlay={autoPlay}
+            onPlay={handlePlay}
+            onPause={handlePause}
+            onError={handleError}
+          />
+        </div>
+      </div>
     </div>
   )
 }

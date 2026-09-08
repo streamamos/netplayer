@@ -2,7 +2,7 @@
   "name": "netplayer-example",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc && vite build --base=./",
     "serve": "vite preview --port 3000",
     "lint": "eslint . --ext .ts,.tsx,.js",

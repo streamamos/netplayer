@@ -184,6 +184,7 @@ const QualityContent = () => {
 
   return (
     <div className={styles.directMenuContent}>
+      <p className={styles.infoText}>{i18n.settings.qualityInfo}</p>
       {state.qualities.map((quality, index) => (
         <div
           key={quality + index}
