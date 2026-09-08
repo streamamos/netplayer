@@ -4,6 +4,7 @@ import { Source } from '../../types';
 import { parseNumberFromString } from '../../utils';
 import styles from './Player.module.css';
 import Hls from 'hls.js';
+import DashJS from '../../types/dashjs';
 import loadScript from '../../utils/load-script';
 
 const HLS_SCRIPT_URL =
