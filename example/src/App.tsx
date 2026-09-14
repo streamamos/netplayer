@@ -23,9 +23,12 @@ const SOURCE_PRESETS: Record<SourceMode, SourcePreset> = {
     description: 'Master playlist + explicit renditions, so you can test manual quality switching.',
     sources: [
       { file: 'https://cdn.bitmovin.com/content/assets/sintel/hls/playlist.m3u8', label: 'auto' },
-      { file: 'https://cdn.bitmovin.com/content/assets/sintel/hls/video/10000kbit.m3u8', label: '1744' },
-      { file: 'https://cdn.bitmovin.com/content/assets/sintel/hls/video/6000kbit.m3u8', label: '818' },
-      { file: 'https://cdn.bitmovin.com/content/assets/sintel/hls/video/250kbit.m3u8', label: '180' },
+      { file: 'https://cdn.bitmovin.com/content/assets/sintel/hls/video/10000kbit.m3u8', label: '1920' },
+      { file: 'https://cdn.bitmovin.com/content/assets/sintel/hls/video/6000kbit.m3u8', label: '1080' },
+      { file: 'https://cdn.bitmovin.com/content/assets/sintel/hls/video/4000kbit.m3u8', label: '720' },
+      { file: 'https://cdn.bitmovin.com/content/assets/sintel/hls/video/1100kbit.m3u8', label: '480' },
+      { file: 'https://cdn.bitmovin.com/content/assets/sintel/hls/video/800kbit.m3u8', label: '360' },
+      { file: 'https://cdn.bitmovin.com/content/assets/sintel/hls/video/250kbit.m3u8', label: '133' },
     ],
   },
   'hls-auto': {

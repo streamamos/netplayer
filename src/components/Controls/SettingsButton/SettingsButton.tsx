@@ -174,13 +174,14 @@ const SubtitleContent = ({ scrollToSubtitle }: { scrollToSubtitle: () => void })
 
 const QualityContent = () => {
   const { state, setState } = useVideoState();
-  const { i18n } = useVideoProps();
+  const { i18n, sources } = useVideoProps();
   
   const handleQualityChange = (value: string) => {
     setState(() => ({ currentQuality: value }));
   };
 
   const activeQuality = state.currentQuality || state.qualities[0];
+  const showActualQuality = sources.length > 1;
 
   return (
     <div className={styles.directMenuContent}>
@@ -196,9 +197,20 @@ const QualityContent = () => {
               <CheckIcon />
             </span>
           )}
-          <span>{quality}</span>
+          <span>{quality === 'auto' ? quality : `${quality}p`}</span>
+          {quality === 'auto' && showActualQuality && state.actualPlayingQuality && (
+            <p className={styles.currentQualityLabel}>
+              {state.actualPlayingQuality === 'auto' ? state.actualPlayingQuality : `${state.actualPlayingQuality}p`}
+            </p>
+          )}
           {quality === 'auto' && <p className={styles.qualityLabel}>{i18n.settings.recommended}</p>}
-          {parseInt(quality) > 720 && <p className={styles.qualityLabel}>{i18n.settings.hd}</p>}
+          {parseInt(quality) >= 1600 ? (
+            <p className={styles.qualityLabel}>{i18n.settings.fourK}</p>
+          ) : parseInt(quality) >= 1080 ? (
+            <p className={styles.qualityLabel}>{i18n.settings.fullHd}</p>
+          ) : parseInt(quality) >= 720 ? (
+            <p className={styles.qualityLabel}>{i18n.settings.hd}</p>
+          ) : null}
         </div>
       ))}
     </div>

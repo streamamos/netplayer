@@ -8,6 +8,7 @@ export interface VideoState {
   subtitles: Subtitle[];
   qualities: string[];
   currentQuality: string | null;
+  actualPlayingQuality: string | null;
   currentSubtitle: string | null;
   isSubtitleDisabled: boolean;
   currentAudio: string | null;
@@ -32,6 +33,7 @@ const defaultVideoState: VideoState = {
   qualities: [],
   audios: [],
   currentQuality: null,
+  actualPlayingQuality: null,
   currentSubtitle: null,
   currentAudio: null,
   isSubtitleDisabled: false,
@@ -143,6 +145,9 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
       // If sources have changed (new episode), reset audios.
       // Otherwise, preserve the current detected audios to avoid disappearing UI on re-renders.
       audios: sourcesChanged ? newState.audios : (prev.audios.length > 0 ? prev.audios : newState.audios),
+      // actualPlayingQuality is tracked at runtime by the Player (HLS/DASH level swaps).
+      // getState() always returns null for it from defaults, so never clobber a live value.
+      actualPlayingQuality: prev.actualPlayingQuality ?? newState.actualPlayingQuality,
     }));
 
     prevSourcesRef.current = props.sources;

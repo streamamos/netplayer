@@ -31,6 +31,8 @@ interface I18nSettings extends I18nField {
   quality: string;
   recommended: string;
   hd: string;
+  fullHd: string;
+  fourK: string;
   subtitleSettings: string;
   reset: string;
   off: string;
@@ -143,6 +145,8 @@ const defaultI18n: I18n = {
     lightBlue: 'Light Blue',
     recommended: 'Recommended',
     hd: 'HD',
+    fullHd: 'Full HD',
+    fourK: '4K',
     showTranscript: 'Show Transcript',
     hideTranscript: 'Hide Transcript',
     transcriptTip: 'Tip: Pause the video at the beginning of a character line and click on the specific subtitle for a better sync',

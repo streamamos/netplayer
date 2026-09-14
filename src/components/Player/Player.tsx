@@ -80,6 +80,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
       setState(() => ({
         qualities: notDuplicatedQualities,
         currentQuality: sortedQualities[0],
+        actualPlayingQuality: sortedQualities[0] || null,
       }));
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sources]);
@@ -121,11 +122,22 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
                       )
                     );
                 }
-                if (sources.length > 1) return;
+                if (sources.length > 1) {
+                  if (_hls.levels?.length) {
+                    const currentLevelIdx = _hls.currentLevel;
+                    if (currentLevelIdx >= 0 && _hls.levels[currentLevelIdx]?.height) {
+                      setState(() => ({
+                        actualPlayingQuality: `${_hls.levels[currentLevelIdx].height}`,
+                      }));
+                    }
+                  }
+                  return;
+                }
                 if (source.label) {
                   setState((prev) => ({
                     qualities: [source.label!],
                     currentQuality: prev?.currentQuality || source.label!,
+                    actualPlayingQuality: source.label!,
                   }));
                   return;
                 }
@@ -135,10 +147,24 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
                   .filter((level) => level.height)
                   .map((level) => `${level.height}`);
                 const level = preferQuality?.(levels) || levels[0];
+                const currentLevelIdx = _hls.currentLevel;
+                const actualQuality =
+                  currentLevelIdx >= 0 && _hls.levels[currentLevelIdx]?.height
+                    ? `${_hls.levels[currentLevelIdx].height}`
+                    : level;
                 setState(() => ({
                   qualities: levels,
                   currentQuality: level,
+                  actualPlayingQuality: actualQuality,
                 }));
+              });
+              _hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
+                const level = _hls.levels[data.level];
+                if (level?.height) {
+                  setState(() => ({
+                    actualPlayingQuality: `${level.height}`,
+                  }));
+                }
               });
             });
 
@@ -238,12 +264,19 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
               if (!bitrates?.length) return;
               dashReady.current = true;
               if (sources.length > 1) {
+                const currentIdx = player.getQualityFor('video');
+                if (currentIdx >= 0 && bitrates[currentIdx]?.height) {
+                  setState(() => ({
+                    actualPlayingQuality: bitrates[currentIdx].height.toString(),
+                  }));
+                }
                 return;
               }
               if (useSourceLabel) {
                 setState((prev) => ({
                   qualities: [source.label!],
                   currentQuality: prev?.currentQuality || source.label!,
+                  actualPlayingQuality: source.label!,
                 }));
               } else {
                 const qualities = bitrates.map(
@@ -269,21 +302,47 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
                     console.warn('Dash setQualityFor failed:', err);
                   }
                 }
+                const currentIdx = player.getQualityFor('video');
+                const actualHeight =
+                  (currentIdx >= 0 && bitrates[currentIdx]?.height?.toString()) ||
+                  bestQuality?.height?.toString() ||
+                  qualities[0];
                 setState((prev) => ({
                   qualities,
                   currentQuality:
                     prev?.currentQuality ||
                     bestQuality?.height?.toString() ||
                     qualities[0],
+                  actualPlayingQuality: actualHeight,
                 }));
               }
             } catch (err) {
               console.warn('Dash stream init handler failed:', err);
             }
           };
+          const handleQualityChanged = (e: any) => {
+            try {
+              if (!player || dashjs.current !== player) return;
+              if (e.mediaType !== 'video') return;
+              const bitrates = player.getBitrateInfoListFor('video');
+              if (!bitrates?.length) return;
+              const idx = e.newQuality ?? player.getQualityFor('video');
+              if (idx >= 0 && bitrates[idx]?.height) {
+                setState(() => ({
+                  actualPlayingQuality: bitrates[idx].height.toString(),
+                }));
+              }
+            } catch (err) {
+              console.warn('Dash quality change handler failed:', err);
+            }
+          };
           player.on(
             'streamInitialized',
             handleStreamInitialized
+          );
+          player.on(
+            'qualityChanged',
+            handleQualityChanged
           );
           player.updateSettings({
             streaming: { abr: { autoSwitchBitrate: { video: useSourceLabel } } },
@@ -324,6 +383,11 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
           }
           videoEl.src = source.file;
           videoEl.load();
+          if (source.label) {
+            setState(() => ({
+              actualPlayingQuality: source.label!,
+            }));
+          }
         }
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -381,6 +445,12 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         );
         if (index === -1) return;
         hls.current.currentLevel = index;
+        const selectedLevel = hls.current.levels[index];
+        if (selectedLevel?.height) {
+          setState(() => ({
+            actualPlayingQuality: `${selectedLevel.height}`,
+          }));
+        }
         return;
       }
       if (shouldPlayDash(source) && sources.length === 1) {
@@ -409,6 +479,11 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         } catch (err) {
           console.warn('Dash setQualityFor failed:', err);
         }
+        if (choseBitrate?.height) {
+          setState(() => ({
+            actualPlayingQuality: choseBitrate.height.toString(),
+          }));
+        }
         return;
       }
       const beforeChangeTime = videoRef.currentTime;
@@ -416,6 +491,11 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
         (source) => source.label === state.currentQuality
       );
       if (!qualitySource) return;
+      if (qualitySource.label) {
+        setState(() => ({
+          actualPlayingQuality: qualitySource.label!,
+        }));
+      }
       initPlayer(qualitySource);
       const handleQualityChange = () => {
         videoRef.currentTime = beforeChangeTime;
