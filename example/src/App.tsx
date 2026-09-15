@@ -207,11 +207,7 @@ const SourceSwitcher: React.FC<{
   onAutoPlayChange: (value: boolean) => void
   onLoadSubtitles: () => void
   subtitlesLoaded: boolean
-  isVip: boolean
-  onIsVipChange: (value: boolean) => void
-  debug: boolean
-  onDebugChange: (value: boolean) => void
-}> = ({ mode, onChange, autoPlay, onAutoPlayChange, onLoadSubtitles, subtitlesLoaded, isVip, onIsVipChange, debug, onDebugChange }) => (
+}> = ({ mode, onChange, autoPlay, onAutoPlayChange, onLoadSubtitles, subtitlesLoaded }) => (
   <div
     style={{
       display: 'flex',
@@ -273,39 +269,6 @@ const SourceSwitcher: React.FC<{
       >
         {subtitlesLoaded ? 'Subtitles loaded' : 'Load subtitles'}
       </button>
-
-      <button
-        onClick={() => onIsVipChange(!isVip)}
-        style={{
-          padding: '6px 14px',
-          borderRadius: 8,
-          border: '1px solid ' + (isVip ? '#ffb547' : '#2b2b30'),
-          backgroundColor: isVip ? 'rgba(255, 181, 71, 0.15)' : 'transparent',
-          color: isVip ? '#ffb547' : '#c7c7cf',
-          fontSize: 13,
-          fontWeight: 600,
-          cursor: 'pointer',
-        }}
-      >
-        {isVip ? '⭐ VIP' : '👤 Non-VIP'}
-      </button>
-
-      <button
-        onClick={() => onDebugChange(!debug)}
-        style={{
-          padding: '6px 14px',
-          borderRadius: 8,
-          border: '1px solid ' + (debug ? '#5c8cff' : '#2b2b30'),
-          backgroundColor: debug ? 'rgba(92, 140, 255, 0.15)' : 'transparent',
-          color: debug ? '#5c8cff' : '#c7c7cf',
-          fontSize: 13,
-          fontWeight: 600,
-          cursor: 'pointer',
-          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-        }}
-      >
-        {debug ? '🔧 Debug: ON' : '🔧 Debug: OFF'}
-      </button>
     </div>
 
     <span style={{ marginLeft: 'auto', fontSize: 13, color: '#7a7a82', maxWidth: 380, textAlign: 'right' }}>
@@ -321,8 +284,6 @@ const App: React.FC = () => {
   const [mode, setMode] = useState<SourceMode>(() => readModeFromUrl())
   const [autoPlay, setAutoPlay] = useState(true)
   const [subtitles, setSubtitles] = useState<any[]>([])
-  const [isVip, setIsVip] = useState(false)
-  const [debug, setDebug] = useState(false)
   const [debugState, setDebugState] = useState<DebugState>({ status: 'loading' })
   const [showSkeleton, setShowSkeleton] = useState(true)
 
@@ -376,10 +337,6 @@ const App: React.FC = () => {
         onAutoPlayChange={setAutoPlay}
         onLoadSubtitles={handleLoadSubtitles}
         subtitlesLoaded={subtitles.length > 0}
-        isVip={isVip}
-        onIsVipChange={setIsVip}
-        debug={debug}
-        onDebugChange={setDebug}
       />
 
       <div style={{ flex: 1, padding: '32px', display: 'flex' }}>
@@ -415,15 +372,14 @@ const App: React.FC = () => {
           )}
 
           <NetPlayer
-            key={`${mode}-${isVip}`}
+            // remount the player whenever the source preset changes
+            key={mode}
             sources={preset.sources}
             subtitles={subtitles}
             skipsegments={SKIP_SEGMENTS}
             className="object-contain w-full h-full"
             thumbnail="https://preview.zorores.com/8b/8bc17ab9537166f2abb7e0bef2b57e23/thumbnails/sprite.vtt"
             autoPlay={autoPlay}
-            isVip={isVip}
-            debug={debug}
             onPlay={handlePlay}
             onPause={handlePause}
             onError={handleError}

@@ -32,7 +32,6 @@ import EnFlag from '../../icons/flags/EnFlag';
 import NoFlag from '../../icons/flags/NoFlag';
 
 import { colorToRgba } from '../../../utils/color';
-import { isQualityAllowed } from '../../../utils';
 
 // Direct content components that bypass the NestedMenu navigation
 const SubtitleContent = ({ scrollToSubtitle }: { scrollToSubtitle: () => void }) => {
@@ -175,10 +174,9 @@ const SubtitleContent = ({ scrollToSubtitle }: { scrollToSubtitle: () => void })
 
 const QualityContent = () => {
   const { state, setState } = useVideoState();
-  const { i18n, sources, isVip } = useVideoProps();
+  const { i18n, sources } = useVideoProps();
   
   const handleQualityChange = (value: string) => {
-    if (!isQualityAllowed(value, isVip)) return;
     setState(() => ({ currentQuality: value }));
   };
 
@@ -188,41 +186,33 @@ const QualityContent = () => {
   return (
     <div className={styles.directMenuContent}>
       <p className={styles.infoText}>{i18n.settings.qualityInfo}</p>
-      {state.qualities.map((quality, index) => {
-        const allowed = isQualityAllowed(quality, isVip);
-        return (
-          <div
-            key={quality + index}
-            className={`${styles.menuItem} ${activeQuality === quality ? styles.activeMenuItem : ''} ${!allowed ? styles.disabledMenuItem : ''}`}
-            onClick={() => handleQualityChange(quality)}
-          >
-            {activeQuality === quality && allowed && (
-              <span className={styles.menuItemCheckIcon}>
-                <CheckIcon />
-              </span>
-            )}
-            <span>{quality === 'auto' ? quality : `${quality}p`}</span>
-            {quality === 'auto' && showActualQuality && state.actualPlayingQuality && (
-              <p className={styles.currentQualityLabel}>
-                {state.actualPlayingQuality === 'auto' ? state.actualPlayingQuality : `${state.actualPlayingQuality}p`}
-              </p>
-            )}
-            {quality === 'auto' && <p className={styles.qualityLabel}>{i18n.settings.recommended}</p>}
-            {parseInt(quality) >= 1600 ? (
-              <p className={styles.qualityLabel}>{i18n.settings.fourK}</p>
-            ) : parseInt(quality) >= 1080 ? (
-              <p className={styles.qualityLabel}>{i18n.settings.fullHd}</p>
-            ) : parseInt(quality) >= 720 ? (
-              <p className={styles.qualityLabel}>{i18n.settings.hd}</p>
-            ) : null}
-            {!allowed && (
-              <span className={styles.vipOnlyLabel}>
-                {i18n.settings.vipOnly}
-              </span>
-            )}
-          </div>
-        );
-      })}
+      {state.qualities.map((quality, index) => (
+        <div
+          key={quality + index}
+          className={`${styles.menuItem} ${activeQuality === quality ? styles.activeMenuItem : ''}`}
+          onClick={() => handleQualityChange(quality)}
+        >
+          {activeQuality === quality && (
+            <span className={styles.menuItemCheckIcon}>
+              <CheckIcon />
+            </span>
+          )}
+          <span>{quality === 'auto' ? quality : `${quality}p`}</span>
+          {quality === 'auto' && showActualQuality && state.actualPlayingQuality && (
+            <p className={styles.currentQualityLabel}>
+              {state.actualPlayingQuality === 'auto' ? state.actualPlayingQuality : `${state.actualPlayingQuality}p`}
+            </p>
+          )}
+          {quality === 'auto' && <p className={styles.qualityLabel}>{i18n.settings.recommended}</p>}
+          {parseInt(quality) >= 1600 ? (
+            <p className={styles.qualityLabel}>{i18n.settings.fourK}</p>
+          ) : parseInt(quality) >= 1080 ? (
+            <p className={styles.qualityLabel}>{i18n.settings.fullHd}</p>
+          ) : parseInt(quality) >= 720 ? (
+            <p className={styles.qualityLabel}>{i18n.settings.hd}</p>
+          ) : null}
+        </div>
+      ))}
     </div>
   );
 };
