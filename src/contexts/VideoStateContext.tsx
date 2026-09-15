@@ -100,9 +100,16 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
           ? (settings.currentAudio as string) || null
           : newState.currentAudio,
       currentQuality:
-        isInArray(settings?.currentQuality, langQualities) ||
-        langQualities.length === 0
+        isInArray(settings?.currentQuality, langQualities)
           ? (settings.currentQuality as string) || null
+          : langQualities.length === 0
+          ? // Qualities not yet known (e.g. HLS/DASH manifest hasn't loaded, or
+            // source has no label). Only accept numeric resolutions from storage;
+            // discard "auto" / non-numeric markers since they only make sense in
+            // multi-source setups where qualities would already be populated.
+            /^\d+$/.test(settings?.currentQuality ?? '')
+            ? (settings.currentQuality as string)
+            : newState.currentQuality
           : newState.currentQuality,
     };
 

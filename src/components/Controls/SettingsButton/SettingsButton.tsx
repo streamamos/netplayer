@@ -181,7 +181,10 @@ const QualityContent = () => {
   };
 
   const activeQuality = state.currentQuality || state.qualities[0];
-  const showActualQuality = sources.length > 1;
+  const showActualQuality =
+    sources.length > 1 &&
+    state.qualities.length > 1 &&
+    state.qualities.includes('auto');
 
   return (
     <div className={styles.directMenuContent}>

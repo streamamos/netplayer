@@ -80,7 +80,8 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
       setState(() => ({
         qualities: notDuplicatedQualities,
         currentQuality: sortedQualities[0],
-        actualPlayingQuality: sortedQualities[0] || null,
+        actualPlayingQuality:
+          sources.length > 1 ? (sortedQualities[0] || null) : null,
       }));
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sources]);
