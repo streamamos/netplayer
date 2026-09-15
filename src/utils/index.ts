@@ -25,6 +25,44 @@ export function parseNumberFromString(str: string) {
   return Number(str.replace(/[^0-9]/g, ''));
 }
 
+export const NON_VIP_MAX_HEIGHT = 720;
+
+export function isQualityAllowed(
+  qualityLabel: string | null | undefined,
+  isVip: boolean | undefined
+): boolean {
+  if (isVip) return true;
+  if (!qualityLabel) return true;
+  const normalized = qualityLabel.toLowerCase();
+  if (normalized === 'auto') return true;
+  const height = parseNumberFromString(qualityLabel);
+  if (!Number.isFinite(height) || height === 0) return true;
+  return height <= NON_VIP_MAX_HEIGHT;
+}
+
+export function filterQualitiesForVip(
+  qualities: string[],
+  isVip: boolean | undefined
+): string[] {
+  if (isVip) return qualities;
+  return qualities.filter((q) => isQualityAllowed(q, isVip));
+}
+
+export function clampQualityForVip(
+  preferredQuality: string | null | undefined,
+  qualities: string[],
+  isVip: boolean | undefined
+): string | null {
+  if (isVip || !preferredQuality) return preferredQuality ?? null;
+  if (isQualityAllowed(preferredQuality, isVip)) return preferredQuality;
+  const allowed = qualities.filter((q) => isQualityAllowed(q, isVip));
+  if (allowed.length === 0) return null;
+  allowed.sort(
+    (a, b) => parseNumberFromString(b) - parseNumberFromString(a)
+  );
+  return allowed[0];
+}
+
 export function isObject<T>(item: T) {
   return item && typeof item === 'object' && !Array.isArray(item);
 }

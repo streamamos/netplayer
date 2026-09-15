@@ -56,6 +56,29 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
+.disabledMenuItem {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+}
+
+.disabledMenuItem:hover {
+  background-color: transparent !important;
+}
+
+.vipOnlyLabel {
+  position: absolute;
+  right: 10px;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: rgba(255, 163, 26, 0.2);
+  color: #ffa31a;
+  border: 1px solid #ffa31a;
+  font-weight: 600;
+}
+
 .activeMenuItem {
   background-color: rgba(255, 255, 255, 0.05);
 }

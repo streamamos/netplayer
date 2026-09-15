@@ -1,7 +1,10 @@
 /* eslint-disable react/prop-types */
 import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import { Audio, Subtitle } from '../types';
-import { isInArray } from '../utils';
+import {
+  clampQualityForVip,
+  isInArray,
+} from '../utils';
 import { useVideoProps } from './VideoPropsContext';
 
 export interface VideoState {
@@ -63,27 +66,39 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
   children,
 }) => {
   const props = useVideoProps();
-  const defaultQualities = useMemo(
-    () =>
-      props.sources
-        .filter((source) => source.label)
-        .map((source) => source.label!),
-    [props.sources]
-  );
-  const defaultState = useMemo(
-    () => ({
+  const isVip = props.isVip;
+  const defaultQualities = useMemo(() => {
+    const all = props.sources
+      .filter((source) => source.label)
+      .map((source) => source.label!);
+    return all;
+  }, [props.sources]);
+  const defaultState = useMemo(() => {
+    const qualities = defaultQualities;
+    const rawFirst = props.sources.find((source) => source.label)?.label;
+    const firstAllowed = clampQualityForVip(rawFirst, qualities, isVip);
+    return {
       currentSubtitle: props.subtitles[0]?.lang,
       subtitles: props.subtitles,
-      qualities: defaultQualities,
-    }),
-    [props.subtitles, defaultQualities]
-  );
+      qualities,
+      currentQuality: firstAllowed ?? qualities[0] ?? null,
+    };
+  }, [props.subtitles, defaultQualities, props.sources, isVip]);
   const getState = useCallback(() => {
     const rawSettings = localStorage.getItem(LOCALSTORAGE_KEY);
-    const newState = {
+    const rawDefaultState = {
       ...defaultVideoState,
       ...defaultState,
       ...props?.defaultVideoState,
+    };
+    const newState = {
+      ...rawDefaultState,
+      qualities: rawDefaultState.qualities,
+      currentQuality: clampQualityForVip(
+        rawDefaultState.currentQuality,
+        rawDefaultState.qualities,
+        isVip
+      ),
     };
     if (!rawSettings) return newState;
     const settings: Partial<VideoState> = JSON.parse(rawSettings);
@@ -94,16 +109,21 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
       .filter((a) => a?.lang)
       .map((s) => s.lang);
     const langQualities = newState.qualities;
+    const rawQuality: string | null =
+      isInArray(settings?.currentQuality, langQualities) ||
+      langQualities.length === 0
+        ? (settings.currentQuality as string) || null
+        : newState.currentQuality;
     const filteredSettings = {
       currentAudio:
         isInArray(settings?.currentAudio, langAudios) || langAudios.length === 0
           ? (settings.currentAudio as string) || null
           : newState.currentAudio,
-      currentQuality:
-        isInArray(settings?.currentQuality, langQualities) ||
-        langQualities.length === 0
-          ? (settings.currentQuality as string) || null
-          : newState.currentQuality,
+      currentQuality: clampQualityForVip(
+        rawQuality,
+        langQualities,
+        isVip
+      ),
     };
 
     let currentSubtitle: string | null;
@@ -129,9 +149,10 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
     }
 
     return { ...newState, ...filteredSettings, currentSubtitle };
-  }, [defaultState, props?.defaultVideoState]);
+  }, [defaultState, props?.defaultVideoState, isVip]);
   const [state, setState] = React.useState<VideoState>(getState);
   const prevSourcesRef = React.useRef(props.sources);
+  const prevIsVipRef = React.useRef(isVip);
 
   useEffect(() => {
     const newState = getState();
@@ -139,19 +160,31 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
     const prevSourcesStr = JSON.stringify(prevSourcesRef.current);
     const sourcesChanged = currentSourcesStr !== prevSourcesStr;
 
-    setState((prev) => ({
-      ...prev,
-      ...newState,
-      // If sources have changed (new episode), reset audios.
-      // Otherwise, preserve the current detected audios to avoid disappearing UI on re-renders.
-      audios: sourcesChanged ? newState.audios : (prev.audios.length > 0 ? prev.audios : newState.audios),
-      // actualPlayingQuality is tracked at runtime by the Player (HLS/DASH level swaps).
-      // getState() always returns null for it from defaults, so never clobber a live value.
-      actualPlayingQuality: prev.actualPlayingQuality ?? newState.actualPlayingQuality,
-    }));
+    setState((prev) => {
+      const qualities = newState.qualities.length
+        ? newState.qualities
+        : prev.qualities;
+      return {
+        ...prev,
+        ...newState,
+        qualities,
+        currentQuality: clampQualityForVip(
+          newState.currentQuality ?? prev.currentQuality,
+          qualities,
+          isVip
+        ),
+        // If sources have changed (new episode), reset audios.
+        // Otherwise, preserve the current detected audios to avoid disappearing UI on re-renders.
+        audios: sourcesChanged ? newState.audios : (prev.audios.length > 0 ? prev.audios : newState.audios),
+        // actualPlayingQuality is tracked at runtime by the Player (HLS/DASH level swaps).
+        // getState() always returns null for it from defaults, so never clobber a live value.
+        actualPlayingQuality: prev.actualPlayingQuality ?? newState.actualPlayingQuality,
+      };
+    });
 
     prevSourcesRef.current = props.sources;
-  }, [getState, props.sources]);
+    prevIsVipRef.current = isVip;
+  }, [getState, props.sources, isVip]);
   useEffect(() => {
     const {
       currentAudio,
@@ -211,7 +244,24 @@ export const VideoStateContextProvider: React.FC<VideoContextProviderProps> = ({
     );
   }, [state]);
   const updateState: UpdateStateAction = (stateSelector) => {
-    setState((prev) => ({ ...prev, ...stateSelector(prev) }));
+    setState((prev) => {
+      const partial = stateSelector(prev);
+      if (!('currentQuality' in partial)) {
+        return { ...prev, ...partial };
+      }
+      const mergedQualities =
+        (partial.qualities?.length ? partial.qualities : prev.qualities) ||
+        [];
+      return {
+        ...prev,
+        ...partial,
+        currentQuality: clampQualityForVip(
+          partial.currentQuality ?? prev.currentQuality,
+          mergedQualities,
+          isVip
+        ),
+      };
+    });
   };
   return (
     <VideoStateContext.Provider value={{ state, setState: updateState }}>
