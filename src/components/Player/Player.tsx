@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useVideoState } from '../../contexts/VideoStateContext';
 import { Source } from '../../types';
-import { parseNumberFromString } from '../../utils';
+import { mergeDeep, parseNumberFromString } from '../../utils';
 import styles from './Player.module.css';
 import Hls from 'hls.js';
 import DashJS from '../../types/dashjs';
@@ -14,11 +14,33 @@ const DASH_SCRIPT_URL =
   'https://cdn.jsdelivr.net/npm/dashjs@latest/dist/dash.all.min.js';
 const DASH_VARIABLE_NAME = 'dashjs';
 
+export const DEFAULT_DASH_SETTINGS: DashJS.MediaPlayerSettingClass = {
+  streaming: {
+    buffer: {
+      bufferTimeAtTopQuality: 30,
+      bufferTimeAtTopQualityLongForm: 60,
+      longFormContentDurationThreshold: 600,
+      bufferToKeep: 20,
+      bufferPruningInterval: 5,
+      stableBufferTime: 12,
+      initialBufferLevel: 2,
+      fastSwitchEnabled: true,
+    },
+    gaps: {
+      jumpGaps: true,
+      jumpLargeGaps: true,
+      smallGapLimit: 0.3,
+      threshold: 0.2,
+    },
+  },
+};
+
 export interface PlayerProps extends React.HTMLAttributes<HTMLVideoElement> {
   sources: Source[];
   hlsRef?: React.MutableRefObject<Hls | null>;
   dashRef?: React.MutableRefObject<DashJS.MediaPlayerClass | null>;
   hlsConfig?: Hls['config'];
+  dashConfig?: Partial<DashJS.MediaPlayerSettingClass>;
   changeSourceUrl?: (currentSourceUrl: string, source: Source) => string;
   onHlsInit?: (hls: Hls, currentSource: Source) => void;
   onDashInit?: (dash: DashJS.MediaPlayerClass, currentSource: Source) => void;
@@ -43,6 +65,7 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
       hlsRef,
       dashRef,
       hlsConfig,
+      dashConfig,
       changeSourceUrl,
       onHlsInit = noop,
       onDashInit = noop,
@@ -345,9 +368,17 @@ const Player = React.forwardRef<HTMLVideoElement, PlayerProps>(
             'qualityChanged',
             handleQualityChanged
           );
-          player.updateSettings({
-            streaming: { abr: { autoSwitchBitrate: { video: useSourceLabel } } },
-          });
+          const mergedSettings: DashJS.MediaPlayerSettingClass = mergeDeep(
+            {},
+            DEFAULT_DASH_SETTINGS,
+            dashConfig ?? {},
+            {
+              streaming: {
+                abr: { autoSwitchBitrate: { video: useSourceLabel } },
+              },
+            }
+          );
+          player.updateSettings(mergedSettings);
           player.initialize();
           player.setAutoPlay(autoPlay || false);
           player.attachView(videoEl);
